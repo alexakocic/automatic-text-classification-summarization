@@ -24,7 +24,6 @@ def _english_word_frequencies():
                Brown and Reuters corpora, respectively
     """
     gutenberg_freqs = FreqDist(gutenberg.words())
-
     webtext_freqs = FreqDist(webtext.words())
     brown_freqs = FreqDist(brown.words())
     reuters_freqs = FreqDist(reuters.words())
@@ -34,8 +33,9 @@ def _english_word_frequencies():
 class SpellChecker:
     """
     Contains methods for correcting misspelled words and checking if a word
-    exists in English language. Words edited by maximum number of 2 edits can 
-    be corrected.
+    exists in English language. Words edited by maximum number of three edits 
+    (character instertion, deletion, permutation and insertion) can be 
+    corrected.
     """
     def __init__(self):
         self.word_frequencies = _english_word_frequencies()
@@ -48,7 +48,7 @@ class SpellChecker:
             word (str): Word for finding edits
         
         Returns:
-            set: All words that are one edit away from input word
+            set of str: All words that are one edit away from input word
         """
         alphabet = 'abcdefghijklmnopqrstuvwxyz'
         
@@ -83,10 +83,23 @@ class SpellChecker:
             word (str): Word for finding edits
         
         Returns:
-            set: All words that are two edits away from input word
+            set of str: All words that are two edits away from input word
         """
         return {edit2 for edit1 in self.__word_edit1(word) 
                 for edit2 in self.__word_edit1(edit1)}
+    
+    def __word_edit3(self, word):
+        """
+        Get all strings that are three edits away from the input word.
+        
+        Args:
+            word (str): Word for finding edits
+        
+        Returns:
+            set of str: All words that are three edits away from input word
+        """
+        return {edit3 for edit2 in self.__word_edit2(word) 
+                for edit3 in self.__word_edit1(edit2)}
     
     def is_known_word(self, word):
         """
@@ -112,7 +125,7 @@ class SpellChecker:
             words (list): List of words
         
         Returns:
-            list: Subset of input list which consists only of words which exist
+            list of str: Subset of input list which consists only of words which exist
                   in english language
         """
         return {word for word in words if self.is_known_word(word)}
@@ -151,9 +164,11 @@ class SpellChecker:
         if self.is_known_word(word):
             return word
         
-        # One edit distance has more importance than two edit distance
+        # One edit distance has more importance than two edit distance and
+        # two edit distance has more importance than three edit distance
         possible_words = self.__known_words(self.__word_edit1(word)) or \
-                         self.__known_words(self.__word_edit2(word))
+                         self.__known_words(self.__word_edit2(word)) or \
+                         self.__known_words(self.__word_edit3(word))
         
         # Word cannot be corrected, no one edit or two edits away words found 
         if not possible_words:
