@@ -17,11 +17,11 @@ from nltk.corpus import reuters
 def _english_word_frequencies():
     """
     Get frequencies of english words based on four corpora:
-    Gutenberg Corpus, Web and Chat Text, Brown Corpus, Reuters Corpus
+    Gutenberg Corpus, Web and Chat Text, Brown Corpus, Reuters Corpus.
     
     Returns:
         tuple: Frequencies of words based on Gutenberg, Web and Chat Text, 
-               Brown and Reuters corpora, respectively.
+               Brown and Reuters corpora, respectively
     """
     gutenberg_freqs = FreqDist(gutenberg.words())
 
@@ -71,7 +71,7 @@ class SpellChecker:
         
         # Get all words that are generated when one letter is inserted at
         # any place in word
-        inserts = [a + c + b[1:] for (a, b) in pairs for c in alphabet]
+        inserts = [a + c + b for (a, b) in pairs for c in alphabet]
         
         return set(deletes + transposes + replaces + inserts)
     
@@ -120,26 +120,8 @@ class SpellChecker:
     def __word_frequency(self, word):
         """
         Get total frequency of a given word based on Gutenberg, Web and Chat 
-        Text, Brown and Reuters corpora
-        
-        Args:
-            word (str): A word which frequency is to be calculated
-        
-        Returns:
-            int: Frequency of a word based on Gutenberg, Web and Chat Text, 
-            Brown and Reuters corpora
-        """
-        sum_freq = 0
-        for freq in self.word_frequencies:
-            sum_freq += freq[word]
-        
-        return sum_freq
-    
-    # TODO: DELETE!
-    def word_frequency(self, word):
-        """
-        Get total frequency of a given word based on Gutenberg, Web and Chat 
-        Text, Brown and Reuters corpora
+        Text, Brown and Reuters corpora. Frequency is 0 if word is not found
+        in corpora.
         
         Args:
             word (str): A word which frequency is to be calculated
@@ -177,8 +159,8 @@ class SpellChecker:
         if not possible_words:
             return word
         
-        # Probability goes first because when using max function,
-        # it sorts elements based on first element                 
+        # Frequency goes first because when using max function, it sorts
+        # elements based on first element                 
         possible_words_frequencies = [(self.__word_frequency(word), word) for 
                                         word in possible_words]
         
