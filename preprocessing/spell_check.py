@@ -33,7 +33,7 @@ def _english_word_frequencies():
 class SpellChecker:
     """
     Contains methods for correcting misspelled words and checking if a word
-    exists in English language. Words edited by maximum number of three edits 
+    exists in English language. Words edited by maximum number of two edits 
     (character instertion, deletion, permutation and insertion) can be 
     corrected.
     """
@@ -87,19 +87,6 @@ class SpellChecker:
         """
         return {edit2 for edit1 in self.__word_edit1(word) 
                 for edit2 in self.__word_edit1(edit1)}
-    
-    def __word_edit3(self, word):
-        """
-        Get all strings that are three edits away from the input word.
-        
-        Args:
-            word (str): Word for finding edits
-        
-        Returns:
-            set of str: All words that are three edits away from input word
-        """
-        return {edit3 for edit2 in self.__word_edit2(word) 
-                for edit3 in self.__word_edit1(edit2)}
     
     def is_known_word(self, word):
         """
@@ -164,11 +151,9 @@ class SpellChecker:
         if self.is_known_word(word):
             return word
         
-        # One edit distance has more importance than two edit distance and
-        # two edit distance has more importance than three edit distance
+        # One edit distance has more importance than two edit distance 
         possible_words = self.__known_words(self.__word_edit1(word)) or \
-                         self.__known_words(self.__word_edit2(word)) or \
-                         self.__known_words(self.__word_edit3(word))
+                         self.__known_words(self.__word_edit2(word))
         
         # Word cannot be corrected, no one edit or two edits away words found 
         if not possible_words:

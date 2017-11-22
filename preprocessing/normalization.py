@@ -7,92 +7,165 @@ Text normalization module. Contains methods for transforming raw text into
 normalized version of it.
 """
 
-import nltk
-from spell_check import SpellChecker
+from nltk.tokenize import sent_tokenize
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
 import re
+from spell_check import SpellChecker
 
-def _tokenize_sentences(text):
+class Normalizer:
     """
-    For a given text, retrieve list of sentences it is made of.
-    
-    Args:
-        text (str): Input text
-    
-    Returns:
-        list: List of sentences that input text is made of
+    Contains methods for normalizing text. Also provides interface to
+    SpellChecker object.
     """
-    return nltk.tokenize.sent_tokenize(text)
-
-def _tokenize_words(sentence):
-    """
-    For a given sentence, retrieve list of words it is made of.
     
-    Args:
-        sentence (str): Input sentence
+    def __init__(self):
+        self.spell_checker = SpellChecker()
+        
+    def spell_checker(self):
+        """
+        Provides interface to SpellChecker from spell_check module.
+        
+        Returns:
+            SpellChecker: SpecllChecker object
+        """
+        return self.spell_checker
+        
+    def __tokenize_sentences(self, text):
+        """
+        For a given text, retrieve list of sentences it is made of.
+        
+        Args:
+            text (str): Input text
+        
+        Returns:
+            list: List of sentences that input text is made of
+        """
+        return sent_tokenize(text)
     
-    Returns:
-        list of str: List of words that input sentence is made of
-    """
-    return nltk.tokenize.word_tokenize(sentence)
-
-def _tokenize(text):
-    """
-    For a given text, retrieve list of all words it consists of.
+    def __tokenize_words(self, sentence):
+        """
+        For a given sentence, retrieve list of words it is made of.
+        
+        Args:
+            sentence (str): Input sentence
+        
+        Returns:
+            list of str: List of words that input sentence is made of
+        """
+        return word_tokenize(sentence)
     
-    Args:
-        text (str): Input text
+    def __tokenize(self, text):
+        """
+        For a given text, retrieve list of all words it consists of.
+        
+        Args:
+            text (str): Input text
+        
+        Returns:
+            list of str: List of words that input text is made of
+        """
+        return [word for sentence in self.__tokenize_sentences(text) 
+                for word in self.__tokenize_words(sentence)]
     
-    Returns:
-        list of str: List of words that input text is made of
-    """
-    return [word for sentence in _tokenize_sentences(text) 
-            for word in _tokenize_words(sentence)]
-
-def _remove_non_word_tokens(word_tokens):
-    """
-    From a list of word tokens, remove all tokens that made only of special
-    characters.
+    def __remove_non_word_tokens(self, word_tokens):
+        """
+        From a list of word tokens, remove all tokens that made only of special
+        characters.
+        
+        Args:
+            word_tokens (list of str): Input tokens
+        
+        Returns:
+            list of str: List of all input word tokens that are not made
+                         exclusively from special characters
+        """
+        return [word_token for word_token in word_tokens 
+                if not re.match(r'^[^A-Za-z0-9]+$', word_token)]
     
-    Args:
-        word_tokens (list of str): Input tokens
+    def __cleanse_word_tokens(self, word_tokens):
+        """
+        Remove all special characters from word tokens and leave only letters
+        and numbers.
+        
+        Args:
+            word_tokens (list of str): Input tokens
+        
+        Returns:
+            list of str: Input word tokens cleansed from special characters 
+        """
+        cleansed_word_tokens = [re.sub('[^A-Za-z0-9]+', '', word_token)
+                for word_token in word_tokens]
+        return list(filter(None, cleansed_word_tokens))
     
-    Returns:
-        list of str: List of all input word tokens that are not made
-                     exclusively from special characters
-    """
-    return [word_token for word_token in word_tokens 
-            if not re.match(r'^[^A-Za-z0-9]+$', word_token)]
-
-def _cleanse_word_tokens(word_tokens):
-    """
-    Remove all special characters from word tokens and leave only letters
-    and numbers.
+    def __correct_word_spelling(self, word_tokens):
+        """
+        Detect wrongly spelled words and try to correct them. If correction fails,
+        it is considered that the word is wrong and wields no meaning so it is
+        removed from list of tokens.
+        
+        Args:
+            word_tokens (list of str): Input tokens
+        
+        Returns:
+            list of str: Input word tokens with corrected spelling, or deleted
+                         if wrongly spelled and not possible to correct
+        """
+        corrected_words = [self.spell_checker.correct_word(word) 
+                           for word in word_tokens]
+        return [corrected_word for corrected_word in corrected_words
+                if self.spell_checker.is_known_word(corrected_word)]
+        
+    def __remove_stop_words(self, word_tokens):
+        """
+        Remove stop words from list of words.
+        
+        Args:
+            word_tokens (list of str): Input tokens
+        
+        Returns:
+            list of str: Input word tokens without stop words
+        """
+        return [word for word in word_tokens 
+                if word not in stopwords.words('english')]
     
-    Args:
-        word_tokens (list of str): Input tokens
+    def __lemmatize_words(self, word_tokens):
+        """
+        Perform word lemmization on each token in list of tokens.
+        
+        Args:
+            word_tokens (list of str): Input tokens
+        
+        Returns:
+            list of str: Lemmatized input word tokens
+        """
+        wordnet_lemmatizer = WordNetLemmatizer()
+        return [wordnet_lemmatizer.lemmatize(word) for word in word_tokens]
     
-    Returns:
-        list of str: Input word tokens cleansed from special characters 
-    """
-    cleansed_word_tokens = [re.sub('[^A-Za-z0-9]+', '', word_token)
-            for word_token in word_tokens]
-    return list(filter(None, cleansed_word_tokens))
-
-def _correct_word_spelling(word_tokens):
-    """
-    Detect wrongly spelled words and try to correct them. If correction fails,
-    it is considered that the word is wrong and wields no meaning so it is
-    removed from list of tokens.
-    
-    Args:
-        word_tokens (list of str): Input tokens
-    
-    Returns:
-        list of str: Input word tokens with corrected spelling, or deleted
-                     if wrongly spelled and not possible to correct
-    """
-    spell_checker = SpellChecker()
-    corrected_words = [spell_checker.correct_word(word) 
-                       for word in word_tokens]
-    return [corrected_word for corrected_word in corrected_words
-            if spell_checker.is_known_word(corrected_word)]
+    def normalize_text(self, text):
+        """
+        Perform raw text normalization. This process includes the following
+        steps:
+            1. Tokenize text into lexical units (words and special characters)
+            2. Remove all tokens that do not contain words
+            3. Clean all tokens from special characters, leave text and
+               numbers only
+            4. Correct spellings of wrongly spelled words. If a word is spelled
+               wrong and cannot be corrected, it is removed from list of tokens
+            5. Remove stop words from list of tokens
+            6. Perform word lemmization
+        
+        Args:
+            text: Raw text
+        
+        Returns:
+            list of str: Normalized text in form of a list of words
+        """
+        tokens = self.__tokenize(text)
+        tokens = self.__remove_non_word_tokens(tokens)
+        tokens = self.__cleanse_word_tokens(tokens)
+        tokens = self.__correct_word_spelling(tokens)
+        tokens = self.__remove_stop_words(tokens)
+        tokens = self.__lemmatize_words(tokens)
+        return tokens
