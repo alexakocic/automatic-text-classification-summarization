@@ -13,6 +13,7 @@ from nltk.corpus import gutenberg
 from nltk.corpus import webtext
 from nltk.corpus import brown
 from nltk.corpus import reuters
+from nltk.corpus import words
 
 def _english_word_frequencies():
     """
@@ -39,6 +40,7 @@ class SpellChecker:
     """
     def __init__(self):
         self.word_frequencies = _english_word_frequencies()
+        self.english_words = set(words.words())
 
     def __word_edit1(self, word):
         """
@@ -99,23 +101,28 @@ class SpellChecker:
             bool: True if word is a part of English language, False if it isn't
         """
         # Presence in English language is determined by using WordNet:
-        # if a word exists in WordNet database, then it is considered it is
-        # a regular English word
-        return True if wordnet.synsets(word, lang='eng') else False
+        # if a word exists in WordNet database or nltk words corpus, then it is
+        # considered it is a regular English word
+        if wordnet.synsets(word, lang='eng'):
+            return True 
+        elif word in self.english_words:
+            return True
+        else:
+            return False
     
-    def __known_words(self, words):
+    def __known_words(self, word_list):
         """
-        Given the set of words, retrieve the subset of words which exist in
+        Given the list of words, retrieve the subset of words which exist in
         English language.
         
         Args:
-            words (list): List of words
+            word_list (list): List of words
         
         Returns:
             list of str: Subset of input list which consists only of words which exist
                   in english language
         """
-        return {word for word in words if self.is_known_word(word)}
+        return {word for word in word_list if self.is_known_word(word)}
     
     def __word_frequency(self, word):
         """
