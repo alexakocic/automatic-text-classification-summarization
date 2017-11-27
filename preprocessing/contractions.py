@@ -1,7 +1,7 @@
 """
 Created on Sun Nov 26 20:11:34 2017
 
-@author: aleks
+@author: Aleksa Kocić
 
 Contains initialized map of contractions.
 """
