@@ -3,7 +3,7 @@ Created on Sun Nov 26 20:11:34 2017
 
 @author: Aleksa Kocić
 
-Contains initialized map of contractions.
+Resource file. Contains initialized map of contractions.
 """
 
 CONTRACTION_MAP = {
