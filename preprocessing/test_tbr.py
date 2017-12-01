@@ -4,11 +4,13 @@ Created on Fri Dec  1 14:19:13 2017
 
 @author: aleks
 """
+from normalization import Normalizer
+import feature_extraction
 
 corpus = list()
 
 d1 = """And produce say the ten moments parties. 
-        Simple innate summer fat appear basket his desire joy. 
+        Simple innate summer fat appear basket his desire joy basket basket. 
         Outward clothes promise at gravity do excited. 
         Sufficient particular impossible by reasonable oh expression is. 
         Yet preference connection unpleasant yet melancholy but end appearance. 
@@ -46,6 +48,8 @@ d5 = """Smile spoke total few great had never their too.
         Is oppose no he summer lovers twenty in. Not his difficulty boisterous surrounded bed. 
         Seems folly if in given scale. Sex contented dependent conveying advantage can use. """
         
+normalizer = Normalizer()
+        
 d1 = normalizer.normalize_text(d1)
 d2 = normalizer.normalize_text(d2)
 d3 = normalizer.normalize_text(d3)
@@ -68,9 +72,9 @@ set_of_words = set ([word for document in corpus for word in document])
 
 print(set_of_words, '\n')
 
-print(bag_of_words_simple(d1, set_of_words), '\n')
-print(bag_of_words_frequencies(d1), '\n')
-print(bag_of_words_tfidf(d1, corpus), '\n')
+print(feature_extraction.bag_of_words_simple(d1, set_of_words), '\n')
+print(feature_extraction.bag_of_words_frequencies(d1), '\n')
+print(feature_extraction.bag_of_words_tfidf(d1, corpus), '\n')
 
-print(bag_of_ngram_frequencies(d1, 2), '\n')
-print(bag_of_ngrams_tfidf(d1, corpus, 2), '\n')
+print(feature_extraction.bag_of_ngrams_frequencies(d1, 2), '\n')
+print(feature_extraction.bag_of_ngrams_tfidf(d1, corpus, 2), '\n')

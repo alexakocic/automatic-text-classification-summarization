@@ -11,7 +11,7 @@ import math
 from nltk import ngrams
 from collections import Counter
 
-def bag_of_words_simple(document, words):
+def bag_of_words_existence(document, words):
     """
     Creates a bag of words from normalized text that are present in a
     predefined set of words.
@@ -112,7 +112,7 @@ def bag_of_words_tfidf(document, corpus):
     
     return bag_of_words
 
-def _get_ngrams(document, n):
+def get_ngrams(document, n):
     """
     Get ngram from a document of normalized text.
     
@@ -125,7 +125,7 @@ def _get_ngrams(document, n):
     """
     return list(ngrams(document, n))
 
-def bag_of_ngram_simple(document, ngrams, n):
+def bag_of_ngrams_simple(document, ngrams, n):
     """
     Creates a bag of ngrams from normalized text that are present in predefined
     set of ngrams.
@@ -137,10 +137,10 @@ def bag_of_ngram_simple(document, ngrams, n):
     Returns:
         set of tuple of str: Set of ngrams present in predefined set of ngrams
     """
-    document = _get_ngrams(document, n)
+    document = get_ngrams(document, n)
     return {ngram for ngram in document if ngram in ngrams}
 
-def bag_of_ngram_frequencies(document, n):
+def bag_of_ngrams_frequencies(document, n):
     """
     Creates a bag of ngrams from normalized text which represents
     ngram:number of ngram appearances in text.
@@ -153,7 +153,7 @@ def bag_of_ngram_frequencies(document, n):
         dict of tuple of str:int pairs: Dictionary of ngram:number of ngram 
                                         appearances in text
     """
-    counted_freqs = Counter(_get_ngrams(document, n))
+    counted_freqs = Counter(get_ngrams(document, n))
     return dict(counted_freqs)
 
 def _ngram_term_frequency(ngram_term, document, n):
@@ -169,7 +169,7 @@ def _ngram_term_frequency(ngram_term, document, n):
     Returns:
         float: Normalized frequency of a ngram in a document
     """
-    return sum([1 for ngram in _get_ngrams(document, n)
+    return sum([1 for ngram in get_ngrams(document, n)
                if ngram == ngram_term])
     
 def _ngram_inverse_document_frequency(ngram, corpus, n):
@@ -190,10 +190,10 @@ def _ngram_inverse_document_frequency(ngram, corpus, n):
     return math.log((len(corpus) + 1)/(1 + sum([1 for document in corpus
                                                   if ngram in
                                                   set(
-                                                    _get_ngrams(document, n)
+                                                    get_ngrams(document, n)
                                                     )])))
 
-def ngram_tfidf(ngram, document, corpus, n):
+def _ngram_tfidf(ngram, document, corpus, n):
     """
      Calculate tfidf value for a ngram for specific document in corpus.
     
@@ -226,10 +226,10 @@ def bag_of_ngrams_tfidf(document, corpus, n):
         dict of tuple of str:float pairs: Dictionary of ngram:tfidf measure of 
                                          a word in text
     """
-    document_ngrams = set(_get_ngrams(document, n))
+    document_ngrams = set(get_ngrams(document, n))
     bag_of_words = dict()
     
     for ngram in document_ngrams:
-        bag_of_words[ngram] = ngram_tfidf(ngram, document, corpus, n)
+        bag_of_words[ngram] = _ngram_tfidf(ngram, document, corpus, n)
     
     return bag_of_words
