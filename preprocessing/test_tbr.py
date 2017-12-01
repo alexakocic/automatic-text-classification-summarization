@@ -2,7 +2,7 @@
 """
 Created on Fri Dec  1 14:19:13 2017
 
-@author: aleks
+@author: Aleksa Kocić
 """
 from normalization import Normalizer
 import feature_extraction
