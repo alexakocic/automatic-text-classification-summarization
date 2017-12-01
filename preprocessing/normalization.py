@@ -15,6 +15,7 @@ from nltk.stem import PorterStemmer
 import re
 from spell_check import SpellChecker
 from contractions import CONTRACTION_MAP
+import feature_extraction
 
 class Normalizer:
     """
