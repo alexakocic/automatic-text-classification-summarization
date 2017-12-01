@@ -4,14 +4,13 @@ Created on Fri Dec  1 17:40:29 2017
 @author: Aleksa Kocić
 
 Feature extraction module. Contains methods for feature extraction from 
-scikit-learn library.
+third-party libraries.
 """
 
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
-from feature_extraction import get_ngrams
 from nltk.stem import PorterStemmer
+from gensim.models import Word2Vec
 
 def scikit_bag_of_words_frequencies(document, ngram_range=(1, 1), 
                                     binary=False):
@@ -71,3 +70,17 @@ def scikit_bag_of_words_tfidf(document, ngram_range=(1, 1)):
     
     bag_of_words = tfidf_vectorizer.fit_transform(document)
     return tfidf_vectorizer, bag_of_words
+
+def word_2_vec(corpus):
+    """
+    Get Word2Vec presentation of a corpus. Each word is represented as a
+    vector.
+    
+    Args:
+        corpus (list of list of str): Corpus of documents
+    
+    Returns:
+        gensim.models.keyedvectors.KeyedVectors: Collection of words presented
+                                                 as vectors
+    """
+    return Word2Vec(corpus, min_count=1).wv
