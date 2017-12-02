@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Fri Dec  1 14:19:13 2017
 
@@ -72,7 +71,7 @@ set_of_words = set ([word for document in corpus for word in document])
 
 print(set_of_words, '\n')
 
-print(feature_extraction.bag_of_words_simple(d1, set_of_words), '\n')
+print(feature_extraction.bag_of_words_existence(d1, set_of_words), '\n')
 print(feature_extraction.bag_of_words_frequencies(d1), '\n')
 print(feature_extraction.bag_of_words_tfidf(d1, corpus), '\n')
 

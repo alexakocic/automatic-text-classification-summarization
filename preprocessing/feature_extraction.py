@@ -104,7 +104,6 @@ def bag_of_words_tfidf(document, corpus):
         dict of str:float pairs: Dictionary of word:tfidf measure of a word 
                                  in text
     """
-    document = set(document)
     bag_of_words = dict()
     
     for word in document:
@@ -224,9 +223,9 @@ def bag_of_ngrams_tfidf(document, corpus, n):
         
     Returns:
         dict of tuple of str:float pairs: Dictionary of ngram:tfidf measure of 
-                                         a word in text
+                                          a word in text
     """
-    document_ngrams = set(get_ngrams(document, n))
+    document_ngrams = get_ngrams(document, n)
     bag_of_words = dict()
     
     for ngram in document_ngrams:
