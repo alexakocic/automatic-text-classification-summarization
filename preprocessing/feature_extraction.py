@@ -64,7 +64,7 @@ def bag_of_words_frequencies(document):
     counted_words = Counter(document)
     return dict(counted_words)
 
-def bag_of_words_existence_corpus(corpus):
+def bag_of_words_frequencies_corpus(corpus):
     """
     Creates feature matrix from corpus of normalized text.
     
