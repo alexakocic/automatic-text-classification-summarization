@@ -42,6 +42,34 @@ def scikit_bag_of_words_frequencies(corpus, ngram_range=(1, 1),
     
     bag_of_words = count_vectorizer.fit_transform(corpus)
     return count_vectorizer, bag_of_words
+            
+def scikit_bag_of_words_tfidf(corpus, ngram_range=(1, 1)):
+    """
+    Get bag of words with tfidf based on a raw document of text.
+    
+    Args:
+        corpus (list of str): Raw documents to be transformed into matrix of
+                              bags of words
+        ngram_range (tuple of int, int): Start and end range for ngrams
+    
+    Returns:
+        sklearn.feature_extraction.text.CountVectorizer: Contains information
+            about bag of words, such as names of features
+        scipy.sparse.csr.csr_matrix: Feature matrix where every word is
+            represented by a row in a matrix and every column is a word
+            of a document
+    """
+    stemmer = PorterStemmer()
+    analyzer = TfidfVectorizer(stop_words='english',
+                               ngram_range=ngram_range).build_analyzer()
+    
+    def stemmed_words(document):
+        return (stemmer.stem(word) for word in analyzer(document))
+    
+    tfidf_vectorizer = TfidfVectorizer(analyzer=stemmed_words)
+    
+    bag_of_words = tfidf_vectorizer.fit_transform(corpus)
+    return tfidf_vectorizer, bag_of_words
 
 def scikit_bag_of_words_simple(corpus, ngram_range=(1, 1), binary=False,
                                type_=0):
@@ -94,34 +122,6 @@ def scikit_bag_of_words_simple(corpus, ngram_range=(1, 1), binary=False,
         feature_matrix.append(vector)
     
     return feature_matrix
-            
-def scikit_bag_of_words_tfidf(corpus, ngram_range=(1, 1)):
-    """
-    Get bag of words with tfidf based on a raw document of text.
-    
-    Args:
-        corpus (list of str): Raw documents to be transformed into matrix of
-                              bags of words
-        ngram_range (tuple of int, int): Start and end range for ngrams
-    
-    Returns:
-        sklearn.feature_extraction.text.CountVectorizer: Contains information
-            about bag of words, such as names of features
-        scipy.sparse.csr.csr_matrix: Feature matrix where every word is
-            represented by a row in a matrix and every column is a word
-            of a document
-    """
-    stemmer = PorterStemmer()
-    analyzer = TfidfVectorizer(stop_words='english',
-                               ngram_range=ngram_range).build_analyzer()
-    
-    def stemmed_words(document):
-        return (stemmer.stem(word) for word in analyzer(document))
-    
-    tfidf_vectorizer = TfidfVectorizer(analyzer=stemmed_words)
-    
-    bag_of_words = tfidf_vectorizer.fit_transform(corpus)
-    return tfidf_vectorizer, bag_of_words
 
 def word_2_vec(corpus):
     """

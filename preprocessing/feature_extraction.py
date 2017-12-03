@@ -27,6 +27,20 @@ def bag_of_words_existence(document, words):
     """
     return set([word for word in document if word in words])
 
+def bag_of_words_existence_corpus(corpus):
+    """
+    Creates feature matrix from corpus of normalized text.
+    
+    Args:
+        corpus (list of list of str): Corpus of normalized text
+    
+    Returns:
+        list of set of str: Feature matrix, list of feature vectors of a 
+                            corpus
+    """
+    words = set([word for document in corpus for word in document])
+    return [bag_of_words_existence(document, words) for document in corpus]
+
 def bag_of_words_frequencies(document):
     """
     Creates a bag of words from normalized text which represents
@@ -41,6 +55,19 @@ def bag_of_words_frequencies(document):
     """
     counted_words = Counter(document)
     return dict(counted_words)
+
+def bag_of_words_frequencies_corpus(corpus):
+    """
+    Creates feature matrix from corpus of normalized text.
+    
+    Args:
+        corpus (list of list of str): Corpus of normalized text
+    
+    Returns:
+        list of dict of str:int pairs: Feature matrix, list of feature vectors
+                                       of a corpus
+    """
+    return [bag_of_words_frequencies(document) for document in corpus]
 
 def term_frequency(term, document):
     """
@@ -73,7 +100,7 @@ def _inverse_document_frequency(term, corpus):
     return math.log((len(corpus) + 1)/(1 + sum([1 for document in corpus
                                                   if term in set(document)])))
 
-def tfidf(term, document, corpus):
+def _tfidf(term, document, corpus):
     """
     Calculate tfidf value for a term for specific document in corpus.
     
@@ -107,9 +134,22 @@ def bag_of_words_tfidf(document, corpus):
     bag_of_words = dict()
     
     for word in document:
-        bag_of_words[word] = tfidf(word, document, corpus)
+        bag_of_words[word] = _tfidf(word, document, corpus)
     
     return bag_of_words
+
+def bag_of_words_tfidf_corpus(corpus):
+    """
+    Creates feature matrix from corpus of normalized text.
+    
+    Args:
+        corpus (list of list of str): Corpus of normalized text
+    
+    Returns:
+        list of set of str:int pairs: Feature matrix, list of feature vectors 
+                                      of a corpus
+    """
+    return [bag_of_words_tfidf(document, corpus) for document in corpus]
 
 def get_ngrams(document, n):
     """
@@ -124,7 +164,7 @@ def get_ngrams(document, n):
     """
     return list(ngrams(document, n))
 
-def bag_of_ngrams_simple(document, ngrams, n):
+def bag_of_ngrams_existence(document, ngrams, n):
     """
     Creates a bag of ngrams from normalized text that are present in predefined
     set of ngrams.
@@ -138,6 +178,56 @@ def bag_of_ngrams_simple(document, ngrams, n):
     """
     document = get_ngrams(document, n)
     return {ngram for ngram in document if ngram in ngrams}
+
+def bag_of_ngrams_existence(corpus):
+    """
+    Creates feature matrix from corpus of normalized text.
+    
+    Args:
+        corpus (list of list of str): Corpus of normalized text
+    
+    Returns:
+        list of set of tuple of str: Feature matrix, list of feature vectors of
+                                     a corpus
+    """
+    ngrams = set([ngram for document in corpus for ngram in document])
+    return [bag_of_ngrams_existence(document, ngrams) for document in corpus]
+
+def bag_of_ngrams_existence_range(document, ngrams, ngram_range=(1, 1)):
+    """
+    Creates a bag of ngrams from normalized text that are present in predefined
+    set of ngrams.
+    
+    Args:
+        document (list of str): Document containing normalized text
+        ngrams (set of tuple of str): Predefined set of ngrams
+        ngram_range (tuple of int): Minimum and maximum range of ngrams
+    Returns:
+        set of tuple of str: Set of ngrams present in predefined set of ngrams
+    """
+    bag_of_words = bag_of_ngrams_existence(document, ngrams, ngram_range[0])
+    num = ngram_range[0] + 1
+    
+    while num <= ngram_range[1]:
+        bag_of_words.update(bag_of_ngrams_existence(document, ngrams, num))
+        num += 1
+    
+    return bag_of_words
+
+def bag_of_ngrams_existence_range_corpus(corpus, ngram_range=(1, 1)):
+    """
+    Creates feature matrix from corpus of normalized text.
+    
+    Args:
+        corpus (list of list of str): Corpus of normalized text
+    
+    Returns:
+        list of set of tuple of str: Feature matrix, list of feature vectors of
+                                     a corpus
+    """
+    ngrams = set([ngram for document in corpus for ngram in document])
+    return [bag_of_ngrams_existence_range(document, ngrams, ngram_range)
+            for document in corpus]
 
 def bag_of_ngrams_frequencies(document, n):
     """
@@ -154,6 +244,55 @@ def bag_of_ngrams_frequencies(document, n):
     """
     counted_freqs = Counter(get_ngrams(document, n))
     return dict(counted_freqs)
+
+def bag_of_ngrams_frequencies_corpus(corpus, n):
+    """
+    Creates feature matrix from corpus of normalized text.
+    
+    Args:
+        corpus (list of list of str): Corpus of normalized text
+    
+    Returns:
+        list of set of tuple of str:int pairs: Feature matrix, list of feature 
+                                               vectors of a corpus
+    """
+    return [bag_of_ngrams_frequencies(document, n) for document in corpus]
+
+def bag_of_ngrams_frequencies_range(document, ngram_range=(1, 1)):
+    """
+    Creates a bag of ngrams from normalized text which represents
+    ngram:number of ngram appearances in text.
+    
+    Args:
+        document (list of str): Normalized text to be transformed
+                                into bag of ngrams
+        ngram_range (tuple of int): Minimum and maximum range of ngrams
+    Returns:
+        dict of tuple of str:int pairs: Dictionary of ngram:number of ngram 
+                                        appearances in text
+    """
+    bag_of_words = bag_of_ngrams_frequencies(document, ngram_range[0])
+    num = ngram_range[0] + 1
+    
+    while num <= ngram_range[1]:
+        bag_of_words.update(bag_of_ngrams_frequencies(document, num))
+        num += 1
+    
+    return bag_of_words
+
+def bag_of_ngrams_frequencies_range_corpus(corpus, ngram_range=(1, 1)):
+    """
+    Creates feature matrix from corpus of normalized text.
+    
+    Args:
+        corpus (list of list of str): Corpus of normalized text
+    
+    Returns:
+        list of dict of tuple of str:int pairs: Feature matrix, list of feature 
+                                                vectors of a corpus
+    """
+    return [bag_of_ngrams_frequencies_range(document, ngram_range)
+            for document in corpus]
 
 def _ngram_term_frequency(ngram_term, document, n):
     """
@@ -232,3 +371,54 @@ def bag_of_ngrams_tfidf(document, corpus, n):
         bag_of_words[ngram] = _ngram_tfidf(ngram, document, corpus, n)
     
     return bag_of_words
+
+def bag_of_ngrams_tfidf_corpus(corpus, n):
+    """
+    Creates feature matrix from corpus of normalized text.
+    
+    Args:
+        corpus (list of list of str): Corpus of normalized text
+    
+    Returns:
+        list of dict of tuple of str:int pairs: Feature matrix, list of feature 
+                                                vectors of a corpus
+    """
+    return [bag_of_ngrams_tfidf(document, n) for document in corpus]
+
+def bag_of_ngrams_tfidf_range(document, corpus, ngram_range=(1, 1)):
+    """
+    Creates a bag of ngrams from normalized text which represents
+    ngram:tfidf of a ngram in a document.
+    
+    Args:
+        document (list of str): Document containing normalized text
+        corpus (list of list of str): List of documents containing normalized
+                                      text
+        ngram_range (tuple of int): Minimum and maximum range of ngrams
+        
+    Returns:
+        dict of tuple of str:float pairs: Dictionary of ngram:tfidf measure of 
+                                          a word in text
+    """
+    bag_of_words = bag_of_ngrams_tfidf(document, corpus, ngram_range[0])
+    num = ngram_range[0] + 1
+    
+    while num <= ngram_range[1]:
+        bag_of_words.update(bag_of_ngrams_tfidf(document, corpus, num))
+        num += 1
+    
+    return bag_of_words
+
+def bag_ngrams_tfidf_range_corpus(corpus, ngram_range=(1, 1)):
+    """
+    Creates feature matrix from corpus of normalized text.
+    
+    Args:
+        corpus (list of list of str): Corpus of normalized text
+    
+    Returns:
+        list of dict of tuple of str:int pairs: Feature matrix, list of feature 
+                                                vectors of a corpus
+    """
+    return [bag_of_ngrams_tfidf_range(document, corpus, ngram_range)
+            for document in corpus]
