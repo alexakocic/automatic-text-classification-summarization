@@ -11,7 +11,7 @@ import math
 from nltk import ngrams
 from collections import Counter
 
-def bag_of_words_existence(document, words):
+def bag_of_words_binary(document, words):
     """
     Creates a bag of words from normalized text that are present in a
     predefined set of words.
@@ -22,12 +22,20 @@ def bag_of_words_existence(document, words):
         words (set of str): Predefined set of words
     
     Returns:
-        set of str: Set of words from normalized text which are present
-                    in predefined set of words
+        dict of str:bool pairs: Set of words with boolean indicator of whether
+                                a word is present in corpus or not
     """
-    return set([word for word in document if word in words])
+    bag_of_words = dict()
+    document = set(document)
+    
+    for word in words:
+        if word in document:
+            bag_of_words[word] = True
+        else:
+            bag_of_words[word] = False
+    return bag_of_words
 
-def bag_of_words_existence_corpus(corpus):
+def bag_of_words_binary_corpus(corpus):
     """
     Creates feature matrix from corpus of normalized text.
     
@@ -39,7 +47,7 @@ def bag_of_words_existence_corpus(corpus):
                             corpus
     """
     words = set([word for document in corpus for word in document])
-    return [bag_of_words_existence(document, words) for document in corpus]
+    return [bag_of_words_binary(document, words) for document in corpus]
 
 def bag_of_words_frequencies(document):
     """
@@ -164,7 +172,7 @@ def get_ngrams(document, n):
     """
     return list(ngrams(document, n))
 
-def bag_of_ngrams_existence(document, ngrams, n):
+def bag_of_ngrams_binary(document, ngrams, n):
     """
     Creates a bag of ngrams from normalized text that are present in predefined
     set of ngrams.
@@ -173,13 +181,23 @@ def bag_of_ngrams_existence(document, ngrams, n):
         document (list of str): Document containing normalized text
         ngrams (set of tuple of str): Predefined set of ngrams
         n (int): Length of ngram
+        
     Returns:
         set of tuple of str: Set of ngrams present in predefined set of ngrams
     """
     document = get_ngrams(document, n)
-    return {ngram for ngram in document if ngram in ngrams}
+    document = set(document)
+    bag_of_ngrams = dict()
+    
+    for ngram in ngrams:
+        if ngram in document:
+            bag_of_ngrams[ngram] = True
+        else:
+            bag_of_ngrams[ngram] = False
+            
+    return bag_of_ngrams
 
-def bag_of_ngrams_existence_corpus(corpus, n):
+def bag_of_ngrams_binary_corpus(corpus, n):
     """
     Creates feature matrix from corpus of normalized text.
     
@@ -191,9 +209,9 @@ def bag_of_ngrams_existence_corpus(corpus, n):
                                      a corpus
     """
     ngrams = set([ngram for document in corpus for ngram in get_ngrams(document, n)])
-    return [bag_of_ngrams_existence(document, ngrams, n) for document in corpus]
+    return [bag_of_ngrams_binary(document, ngrams, n) for document in corpus]
 
-def bag_of_ngrams_existence_range(document, ngrams, ngram_range=(1, 1)):
+def bag_of_ngrams_binary_range(document, ngrams, ngram_range=(1, 1)):
     """
     Creates a bag of ngrams from normalized text that are present in predefined
     set of ngrams.
@@ -202,17 +220,18 @@ def bag_of_ngrams_existence_range(document, ngrams, ngram_range=(1, 1)):
         document (list of str): Document containing normalized text
         ngrams (set of tuple of str): Predefined set of ngrams
         ngram_range (tuple of int): Minimum and maximum range of ngrams
+        
     Returns:
         set of tuple of str: Set of ngrams present in predefined set of ngrams
     """
-    bag_of_words = bag_of_ngrams_existence(document, ngrams, ngram_range[0])
+    bag_of_ngrams = bag_of_ngrams_binary(document, ngrams, ngram_range[0])
     num = ngram_range[0] + 1
     
     while num <= ngram_range[1]:
-        bag_of_words.update(bag_of_ngrams_existence(document, ngrams, num))
+        bag_of_ngrams.update(bag_of_ngrams_binary(document, ngrams, num))
         num += 1
     
-    return bag_of_words
+    return bag_of_ngrams
 
 def bag_of_ngrams_frequencies(document, n):
     """
@@ -223,6 +242,7 @@ def bag_of_ngrams_frequencies(document, n):
         document (list of str): Normalized text to be transformed
                                 into bag of ngrams
         n (int): Length of ngram
+        
     Returns:
         dict of tuple of str:int pairs: Dictionary of ngram:number of ngram 
                                         appearances in text
@@ -256,14 +276,14 @@ def bag_of_ngrams_frequencies_range(document, ngram_range=(1, 1)):
         dict of tuple of str:int pairs: Dictionary of ngram:number of ngram 
                                         appearances in text
     """
-    bag_of_words = bag_of_ngrams_frequencies(document, ngram_range[0])
+    bag_of_ngrams = bag_of_ngrams_frequencies(document, ngram_range[0])
     num = ngram_range[0] + 1
     
     while num <= ngram_range[1]:
-        bag_of_words.update(bag_of_ngrams_frequencies(document, num))
+        bag_of_ngrams.update(bag_of_ngrams_frequencies(document, num))
         num += 1
     
-    return bag_of_words
+    return bag_of_ngrams
 
 def bag_of_ngrams_frequencies_range_corpus(corpus, ngram_range=(1, 1)):
     """
@@ -350,12 +370,12 @@ def bag_of_ngrams_tfidf(document, corpus, n):
                                           a word in text
     """
     document_ngrams = get_ngrams(document, n)
-    bag_of_words = dict()
+    bag_of_ngrams = dict()
     
     for ngram in document_ngrams:
-        bag_of_words[ngram] = _ngram_tfidf(ngram, document, corpus, n)
+        bag_of_ngrams[ngram] = _ngram_tfidf(ngram, document, corpus, n)
     
-    return bag_of_words
+    return bag_of_ngrams
 
 def bag_of_ngrams_tfidf_corpus(corpus, n):
     """
@@ -385,14 +405,14 @@ def bag_of_ngrams_tfidf_range(document, corpus, ngram_range=(1, 1)):
         dict of tuple of str:float pairs: Dictionary of ngram:tfidf measure of 
                                           a word in text
     """
-    bag_of_words = bag_of_ngrams_tfidf(document, corpus, ngram_range[0])
+    bag_of_ngrams = bag_of_ngrams_tfidf(document, corpus, ngram_range[0])
     num = ngram_range[0] + 1
     
     while num <= ngram_range[1]:
-        bag_of_words.update(bag_of_ngrams_tfidf(document, corpus, num))
+        bag_of_ngrams.update(bag_of_ngrams_tfidf(document, corpus, num))
         num += 1
     
-    return bag_of_words
+    return bag_of_ngrams
 
 def bag_of_ngrams_tfidf_range_corpus(corpus, ngram_range=(1, 1)):
     """
