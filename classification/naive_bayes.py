@@ -8,9 +8,8 @@ from collections import Counter
 
 class NaiveBayes:
     """
-    Naive Bayes classifier. Based on Bayesian rule for a document d and a
-    class c:
-        P(c|d) = p(d|c)P(c)/P(d)
+    Naive Bayes classifier.
+    Based on: https://web.stanford.edu/class/cs124/lec/naivebayes.pdf
     """
     
     def __class_probability(self, class_, training_vectors):
@@ -93,7 +92,6 @@ class NaiveBayes:
             training_vectors (list of tuple of dict, str): List of classified 
                                                            bag of words
 
-        
         Returns:
             dict of str:dict of str:float values: Dictionary of every word's
                 from vocabulary probabilities based on every class
@@ -110,3 +108,50 @@ class NaiveBayes:
             probabilities[word] = class_probabilities
         
         return probabilities
+    
+    def train(self, training_vectors):
+        """
+        Train classification model.
+        
+        Args:
+            training_vectors (list of tuple of dict, str): List of classified 
+                                                           bag of words
+        """
+        vectors = [vector[0] for vector in training_vectors]
+        self.classes = set([vector[1] for vector in training_vectors])
+        self.vocabulary = set([word for vector in vectors for word in vector.keys()])
+        
+        self.word_probabilities = self.__word_probabilities_for_classes(self.vocabulary, 
+                                                                   self.classes, 
+                                                                   training_vectors)
+        self.class_probabilities = self.__class_probabilities(self.classes, training_vectors)        
+
+    def classify(self, document):
+        """
+        Use trained model to classify a document.
+        
+        Args:
+            document (dict of str:bool pairs): Bag of words containing information
+                about which word from vocabulary is present in a document
+                
+        Returns:
+            str: Class label of document
+        """
+        words = [word for word in document if document[word]]
+        
+        max_probability = 0.0
+        
+        for class_ in self.classes:
+            class_probability = self.class_probabilities[class_]
+            word_probabilities_product = 1.0
+            
+            for word in words:
+                word_probabilities_product *= self.word_probabilities[word][class_]
+                
+            class_probability *= word_probabilities_product
+            
+            if class_probability > max_probability:
+                max_probability = class_probability
+                cmap = class_
+        
+        return cmap
