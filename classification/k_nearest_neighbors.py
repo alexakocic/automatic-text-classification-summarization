@@ -6,6 +6,7 @@ Created on Fri Dec  8 13:50:19 2017
 K-Nearest neighbors classifier.
 """
 
+import sys
 from scipy.spatial import distance
 
 class KNearestNeighbors:
@@ -124,6 +125,13 @@ class KNearestNeighbors:
         Returns:
             str: Class label of document
         """
+        if k == 0:
+            raise ValueError("Must enter positive value for k parameter.")
+            
+        # If only one neighbor, do more optimal calculation
+        if k == 1:
+            return self.__classify_nearest_neighbor(document, distance_type)
+            
         # List of distance - class tuples
         nearest_neighbors = list()
         
@@ -141,6 +149,57 @@ class KNearestNeighbors:
                             nearest_neighbors[j] = nearest_neighbors[j - 1]
                             j -= 1
                         nearest_neighbors[i] = (distance, vector[1])
+                        break
         
-        nearest_neighbor = min(nearest_neighbors)
-        return nearest_neighbor[1]
+        occurrences = dict()
+        for neighbor in nearest_neighbors:
+            if neighbor[1] not in nearest_neighbors.keys():
+                occurrences[neighbor[1]] = 1
+            else:
+                occurrences[neighbor[1]] += 1
+        
+        class_count = [(ocurrence, class_) for class_, ocurrence in occurrences]
+        return class_count[max(class_count)]
+    
+    def __classify_nearest_neighbor(self, document, distance_type):
+        """
+        Special case of k-nearest neighbors where k= = 1.
+        
+        Args:
+            document (dict of str:float pairs): Bag of words containing information
+                about which word from vocabulary is present in a document
+            distance_type: Type of distance calculation. Allowed types are:
+                * For numeric vectors *
+                - braycurtis: Computes the Bray-Curtis distance between two arrays.
+                - canberra: Computes the Canberra distance between two arrays.
+                - chebyshev: 	Computes the Chebyshev distance.
+                - cityblock: Computes the City Block (Manhattan) distance.
+                - correlation: Computes the correlation distance between two arrays.
+                - cosine: Computes the Cosine distance between arrays.
+                - euclidean: Computes the Euclidean distance between two arrays.
+                - sqeuclidean: Computes the squared Euclidean distance between two arrays.
+                
+                * For boolean vectors *
+                - dice: Computes the Dice dissimilarity between two boolean arrays.
+                - hamming: Computes the Hamming distance between two arrays.
+                - jaccard: Computes the Jaccard-Needham dissimilarity between two boolean arrays.
+                - kulsinski: Computes the Kulsinski dissimilarity between two boolean arrays.
+                - rogerstanimoto: Computes the Rogers-Tanimoto dissimilarity between two boolean arrays.
+                - russellrao: Computes the Russell-Rao dissimilarity between two boolean arrays.
+                - sokalmichener: Computes the Sokal-Michener dissimilarity between two boolean arrays.
+                - sokalsneath: Computes the Sokal-Sneath dissimilarity between two boolean arrays.
+                - yule: Computes the Yule dissimilarity between two boolean arrays.
+                
+        Returns:
+            str: Class label of document
+        """
+        min_distance = sys.float_info.max
+        min_class = ""
+        
+        for vector in self.vectors:
+            distance = self.distance(document, vector[0], distance_type)
+            if distance < min_distance:
+                min_distance = distance
+                min_class = vector[1]
+        
+        return min_class
