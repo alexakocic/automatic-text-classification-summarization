@@ -19,8 +19,8 @@ class NaiveBayes:
         
         Args:
             class_ (str): Name of a class
-            training_vectors (list of tuple of dict, str): List of classified 
-                                                           bag of words
+            training_vectors (list of tuple of dict of str:float pairs, str): 
+                List of classified bag of words
         
         Returns:
             float: Probability of class
@@ -38,8 +38,8 @@ class NaiveBayes:
             word (str): A word whose frequency is calculated
             class_ (str): Class of documents based on which word frequency
                           is calculated
-            training_vectors (list of tuple of dict, str): List of classified 
-                                                           bag of words
+            training_vectors (list of tuple of dict of str:float pairs, str): 
+                List of classified bag of words
             vocabulary (set of str): Set of all words from training set
         
         Returns:
@@ -54,7 +54,7 @@ class NaiveBayes:
                 count += vector[word]
         
         sum_of_words = sum([value for vector in vectors
-                            for word, value in vector])
+                            for word, value in vector.items()])
         
         # Include add-1 smoothing if word is not in any document to avoid
         # zeroing out Cmap calculation
@@ -67,8 +67,8 @@ class NaiveBayes:
         
         Args:
             classes (list of str): Names of classes
-            training_vectors (list of tuple of dict, str): List of classified 
-                                                           bag of words
+            training_vectors (list of tuple of dict of str:float pairs, str): 
+                List of classified bag of words
         
         Returns:
             dict of str:float values: Dictionary of classes with their respective
@@ -89,8 +89,8 @@ class NaiveBayes:
         Args:
             vocabulary (set of str): Set of all words from training set
             classes (list of str): Names of classes
-            training_vectors (list of tuple of dict, str): List of classified 
-                                                           bag of words
+            training_vectors (list of tuple of dict of str:float pairs, str): 
+                List of classified bag of words
 
         Returns:
             dict of str:dict of str:float values: Dictionary of every word's
@@ -114,8 +114,8 @@ class NaiveBayes:
         Train classification model.
         
         Args:
-            training_vectors (list of tuple of dict, str): List of classified 
-                                                           bag of words
+            training_vectors (list of tuple of dict of str:float pairs, str): 
+                List of classified bag of words
         """
         vectors = [vector[0] for vector in training_vectors]
         self.classes = set([vector[1] for vector in training_vectors])
