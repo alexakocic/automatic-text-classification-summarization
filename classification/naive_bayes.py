@@ -50,7 +50,7 @@ class NaiveBayes:
         
         count = 0
         for vector in vectors:
-            if word in vector.keys():
+            if word in set(vector.keys()):
                 count += vector[word]
         
         sum_of_words = sum([value for vector in vectors
@@ -124,34 +124,38 @@ class NaiveBayes:
         self.word_probabilities = self.__word_probabilities_for_classes(self.vocabulary, 
                                                                    self.classes, 
                                                                    training_vectors)
-        self.class_probabilities = self.__class_probabilities(self.classes, training_vectors)        
+        self.class_probabilities = self.__class_probabilities(self.classes, training_vectors)      
 
-    def classify(self, document):
+    def classify(self, vectors):
         """
         Use trained model to classify a document.
         
         Args:
-            document (dict of str:bool pairs): Bag of words containing information
-                about which word from vocabulary is present in a document
+            vectors (list of set of str): Vectors to be classified
                 
         Returns:
             str: Class label of document
-        """
-        words = [word for word in document if document[word]]
+        """        
+        classes = list()
         
-        max_probability = 0.0
-        
-        for class_ in self.classes:
-            class_probability = self.class_probabilities[class_]
-            word_probabilities_product = 1.0
+        for vector in vectors:
+            max_probability = 0.0
             
-            for word in words:
-                word_probabilities_product *= self.word_probabilities[word][class_]
+            cmap = ""
+            
+            for class_ in self.classes:
+                class_probability = self.class_probabilities[class_]
+                word_probabilities_product = 1.0
                 
-            class_probability *= word_probabilities_product
-            
-            if class_probability > max_probability:
-                max_probability = class_probability
-                cmap = class_
-        
-        return cmap
+                for word in vector:
+                    if word in self.vocabulary:
+                        word_probabilities_product *= self.word_probabilities[word][class_]
+                    
+                class_probability *= word_probabilities_product
+                
+                if class_probability > max_probability:
+                    max_probability = class_probability
+                    cmap = class_
+                
+            classes.append(cmap)
+        return classes
