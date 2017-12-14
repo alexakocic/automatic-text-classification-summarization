@@ -22,18 +22,12 @@ def bag_of_words_binary(document, words):
         words (set of str): Predefined set of words
     
     Returns:
-        dict of str:bool pairs: Set of words with boolean indicator of whether
-                                a word is present in corpus or not
+        set of str: Set of words from document which belong to set of predefined
+                    words
     """
-    bag_of_words = dict()
     document = set(document)
     
-    for word in words:
-        if word in document:
-            bag_of_words[word] = True
-        else:
-            bag_of_words[word] = False
-    return bag_of_words
+    return set([word for word in document if word in words])
 
 def bag_of_words_binary_corpus(corpus):
     """
@@ -141,7 +135,7 @@ def bag_of_words_tfidf(document, corpus):
     """
     bag_of_words = dict()
     
-    for word in document:
+    for word in set(document):
         bag_of_words[word] = _tfidf(word, document, corpus)
     
     return bag_of_words
@@ -406,7 +400,7 @@ def bag_of_ngrams_tfidf_range(document, corpus, ngram_range=(1, 1)):
                                           a word in text
     """
     bag_of_ngrams = bag_of_ngrams_tfidf(document, corpus, ngram_range[0])
-    num = ngram_range[0] + 1
+    num = ngram_range[0] #+ 1
     
     while num <= ngram_range[1]:
         bag_of_ngrams.update(bag_of_ngrams_tfidf(document, corpus, num))

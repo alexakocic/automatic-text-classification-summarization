@@ -55,14 +55,7 @@ class FeatureExtractor:
         elif type_ == "tfidf-ngram":
             bag_of_words = feature_extraction.bag_of_ngrams_tfidf_range_corpus(corpus, ngram_range)
         else:
-            raise ValueError("""Wrong type input. Choose one of following types:
-                                - binary
-                                 - frequency
-                                 - tfidf
-                                 - binary-ngram
-                                 - frequency-ngram
-                                 - tfidf-ngram
-                             """)
+            raise ValueError("""Wrong type_ input. Type help(bag_of_words) to see supported types.""")
         
         return bag_of_words
     

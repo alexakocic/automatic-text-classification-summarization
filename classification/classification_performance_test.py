@@ -26,6 +26,7 @@ labels = [dataset.target_names[label] for label in labels]
 
 corpus, labels = remove_empty_docs(corpus, labels)
 
+"""
 normalizer = Normalizer()
 
 print("Normalizing")
@@ -40,3 +41,4 @@ training_set = list(zip(training_set, labels))
 naive_bayes = NaiveBayes()
 print("Training")
 naive_bayes.train(training_set)
+"""

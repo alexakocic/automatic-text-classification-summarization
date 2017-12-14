@@ -21,7 +21,6 @@ class Normalizer:
     Contains methods for normalizing text. Also provides interface to
     SpellChecker object.
     """
-    
     def __init__(self):
         self.spell_checker = SpellChecker()
         
@@ -214,7 +213,7 @@ class Normalizer:
         return [porter_stemmer.stem(word) for word in word_tokens]
         
     
-    def normalize_text(self, text):
+    def normalize_text(self, text, spell_check=False):
         """
         Perform raw text normalization. This process includes the following
         steps:
@@ -229,6 +228,8 @@ class Normalizer:
         
         Args:
             text: Raw text
+            spell_check: Should spell checking be done when tokenizing words,
+                         slows down performance if used
         
         Returns:
             list of str: Normalized text in form of a list of words
@@ -237,7 +238,8 @@ class Normalizer:
         tokens = self.__lower(tokens)
         tokens = self.__remove_non_word_tokens(tokens)
         tokens = self.__cleanse_word_tokens(tokens)
-        tokens = self.__correct_word_spelling(tokens)
+        if spell_check:
+            tokens = self.__correct_word_spelling(tokens)
         tokens = self.__remove_stop_words(tokens)
         tokens = self.__stem_words(tokens)
         return tokens
