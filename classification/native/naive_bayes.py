@@ -2,6 +2,8 @@
 Created on Mon Dec  4 20:52:10 2017
 
 @author: Aleksa Kocić
+
+Naive Bayes classifier.
 """
 
 from collections import Counter

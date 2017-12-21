@@ -72,9 +72,9 @@ class TfidfExtractor(FeatureExtractor):
     """
     Contains methods for extracting tfidf from document based on a training set.
     """
-    def __init__(self, vocabulary, corpus, ngram_range):
+    def __init__(self, vocabulary, idf_dict, ngram_range):
         super().__init__(vocabulary, ngram_range)
-        self.corpus = corpus
+        self.idf_dict = idf_dict
     
     def extract_features(self, document):
         """
@@ -94,9 +94,7 @@ class TfidfExtractor(FeatureExtractor):
         for term in document:
             if term in self.vocabulary.keys():
                 tf = _term_frequency(term, document)
-                idf = math.log((self.corpus.shape[0] + 1)/(1 + sum([1 for value in 
-                                           self.corpus[:,self.vocabulary[term]]
-                                                   if value])))
+                idf = self.idf_dict[term]
                 row[self.vocabulary[term]] = tf * idf
         
         return csr_matrix(row)
@@ -251,7 +249,7 @@ def _inverse_document_frequency(term, corpus):
     return math.log((len(corpus) + 1)/(1 + sum([1 for document in corpus
                                                   if term in set(document)])))
 
-def _tfidf(term, document, corpus):
+def _tfidf(term, document, idf_dict):
     """
     Calculate tfidf value for a term for specific document in corpus.
     
@@ -266,10 +264,10 @@ def _tfidf(term, document, corpus):
                corpus
     """
     tf = _term_frequency(term, document)
-    idf = _inverse_document_frequency(term, corpus)
-    return tf * idf
+    #idf = _inverse_document_frequency(term, corpus)
+    return tf * idf_dict[term]
 
-def _tfidf_document(document, corpus):
+def _tfidf_document(document, corpus, idf_dict):
     """
     Calculate tfidf dictionary for every term in a document in a given corpus.
     
@@ -283,9 +281,20 @@ def _tfidf_document(document, corpus):
     tfidfs = dict()
     
     for term in document:
-        tfidfs[term] = _tfidf(term, document, corpus)
+        tfidfs[term] = _tfidf(term, document, idf_dict)
     
     return tfidfs
+
+def _idf_dict(corpus):
+    words = set([word for document in corpus for word in document])
+    idf_dict = dict()
+    n = len(corpus)
+    
+    for word in words:
+        idf_dict[word] = math.log((n + 1)/(1 + sum([1 for document in corpus
+                                                  if word in set(document)])))
+    
+    return idf_dict
 
 def tfidf(corpus, ngram_range=(1, 1)):
     """
@@ -299,16 +308,18 @@ def tfidf(corpus, ngram_range=(1, 1)):
         dict of str/tuple of str: float: Tfidf dictionaries
     """
     
-    save_corpus = bag_of_words(corpus, binary=True, ngram_range=ngram_range)[0]
+    #save_corpus = bag_of_words(corpus, binary=True, ngram_range=ngram_range)[0]
     vocabulary = _create_vocabulary(corpus, ngram_range)
     if ngram_range != (1, 1):
         corpus = [_get_ngram_range(document, ngram_range) for document in corpus]
+        
+    idf_dict = _idf_dict(corpus)
     
-    feature_extractor = TfidfExtractor(vocabulary, save_corpus, ngram_range)
+    feature_extractor = TfidfExtractor(vocabulary, idf_dict, ngram_range)
     features = None
     
     for document in corpus:
-        tfidf_ = _tfidf_document(document, corpus)
+        tfidf_ = _tfidf_document(document, corpus, idf_dict)
         row = [0.0] * len(vocabulary)
         for word, value in tfidf_.items():
             row[vocabulary[word]] = tfidf_[word]

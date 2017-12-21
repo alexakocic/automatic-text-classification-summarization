@@ -13,7 +13,7 @@ from scipy.sparse import hstack
 from scipy.spatial import distance
 
 class KNearestNeighbors:
-    def train(self, training_vectors, type_="tfidf"):
+    def train(self, training_vectors, classes, vocabulary, type_="tfidf"):
         """
         Train classification model.
         
@@ -29,38 +29,10 @@ class KNearestNeighbors:
             raise ValueError("""Wrong value for type_ parameter. Type help(train) 
             to see list of possible values.""")
         
-        self.type = type_
-        
-        vocabulary = set([word for vector in training_vectors 
-                               for word, value in vector[0].items()])
-        
-        # Vocabulary of word - index for columns in matrix
-        self.vocabulary = dict()
-        counter = 0
-        for word in vocabulary:
-            self.vocabulary[word] = counter
-            counter += 1
-        
-        # Classes of training documents
-        self.classes = list()
-        #Transform training document dictionaries to vectors
-        vectors = csr_matrix([])
-        for vector in training_vectors:
-            if type_ == "binary":
-                row = [False] * len(self.vocabulary)
-            elif type_ == "frequency":
-                row = [0] * len(self.vocabulary)
-            else:
-                row = [0.0] * len(self.vocabulary)
-            
-            for word, value in vector[0].items():
-                row[self.vocabulary[word]] = value
-            
-            row = csr_matrix(row)
-            vectors = self._csr_vappend(vectors, row)
-            self.classes.append(vector[1])
-        
-        self.vectors = vectors
+        self.type = type_        
+        self.vocabulary = vocabulary
+        self.classes = classes
+        self.vectors = training_vectors
     
     def distance(self, vector1, vector2, type_):
         """ 
@@ -170,18 +142,7 @@ class KNearestNeighbors:
         """
         if k == 0:
             raise ValueError("Must enter positive value for k parameter.")
-            
-        # Transform dictionary to vector
-        if self.type == "tfidf":
-            document_vector = [0.0] * len(self.vocabulary)
-        elif self.type == "frequency":
-            document_vector = [0] * len(self.vocabulary)
-        else:
-            document_vector = [False] * len(self.vocabulary)
-        
-        for word, value in document.items():
-            document_vector[self.vocabulary[word]] = value
-            
+                        
         # If only one neighbor, do more optimal calculation
         if k == 1:
             return self.__classify_nearest_neighbor(document, distance_type)
@@ -189,8 +150,8 @@ class KNearestNeighbors:
         # List of distance - class tuples
         nearest_neighbors = list()
         
-        for index in len(self.vectors):
-            vector = self.vectors[index:].toarray().tolist()
+        for index in self.vectors.shape[0]:
+            vector = self.vectors[index, :].data.tolist()
             distance = self.distance(document, vector, distance_type)
             n = len(nearest_neighbors)
             
@@ -208,7 +169,7 @@ class KNearestNeighbors:
         
         occurrences = dict()
         for neighbor in nearest_neighbors:
-            if neighbor[1] not in nearest_neighbors.keys():
+            if neighbor[1] not in occurrences.keys():
                 occurrences[neighbor[1]] = 1
             else:
                 occurrences[neighbor[1]] += 1
@@ -252,30 +213,11 @@ class KNearestNeighbors:
         min_distance = sys.float_info.max
         min_class = ""
         
-        for index in range(self.vectors):
-            vector = self.vectors[index:].toarray().tolist()
+        for index in self.vectors.shape[0]:
+            vector = self.vectors[index:].data.tolist()
             distance = self.distance(document, vector, distance_type)
             if distance < min_distance:
                 min_distance = distance
                 min_class = self.classes[index]
         
         return min_class
-    
-    def _csr_vappend(a, b):
-        """ Takes in 2 csr_matrices and appends the second one to the bottom of the first one. 
-        Much faster than scipy.sparse.vstack but assumes the type to be csr and overwrites
-        the first matrix instead of copying it. The data, indices, and indptr still get copied.
-        
-        Args:
-            a (scipy.sparse.csr_matrix): Sparse matrix
-            b (scipy.sparse.csr_matrix): Sparse matrix
-            
-        Returns:
-            scipy.sparse.csr_matrix: Stacked sparce matrix
-        """
-
-        a.data = np.hstack((a.data,b.data))
-        a.indices = np.hstack((a.indices,b.indices))
-        a.indptr = np.hstack((a.indptr,(b.indptr + a.nnz)[1:]))
-        a._shape = (a.shape[0]+b.shape[0],b.shape[1])
-        return a
