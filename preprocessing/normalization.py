@@ -72,7 +72,7 @@ class Normalizer:
         return [self.__expand_contractions_sentence(sentence, contraction_map)
                 for sentence in sentence_tokens]
         
-    def __tokenize_sentences(self, text):
+    def tokenize_sentences(self, text):
         """
         For a given text, retrieve list of sentences it is made of.
         
@@ -109,9 +109,9 @@ class Normalizer:
             list of str: List of words that input text is made of
         """
         return [word for sentence in 
-                self.__expand_contractions(self.__tokenize_sentences(text),
+                self.__expand_contractions(self.tokenize_sentences(text),
                                            CONTRACTION_MAP) 
-                for word in self.__tokenize_words(sentence)]
+                for word in self.__tokenize_words(sentence.strip())]
     
     def __lower(self, word_tokens):
         """
@@ -234,6 +234,8 @@ class Normalizer:
         Returns:
             list of str: Normalized text in form of a list of words
         """
+        text = text.strip()
+        re.sub('[^A-Za-z0-9]+', '', text)
         tokens = self.__tokenize(text)
         tokens = self.__lower(tokens)
         tokens = self.__remove_non_word_tokens(tokens)
