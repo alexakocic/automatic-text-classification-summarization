@@ -13,8 +13,8 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.stem import PorterStemmer
 import re
-from spell_check import SpellChecker
-from contractions import CONTRACTION_MAP
+from preprocessing.spell_check import SpellChecker
+from preprocessing.contractions import CONTRACTION_MAP
 
 class Normalizer:
     """
