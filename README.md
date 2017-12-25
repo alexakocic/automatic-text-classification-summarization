@@ -1,2 +1,2 @@
-# master-thesis
-Text classification and summarization
+# Text classification and summarization
+Library containing functions for classifying and summarizing text documents.
