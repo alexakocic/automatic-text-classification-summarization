@@ -2925,3 +2925,591 @@ Accuracy: 0.49
 Precision: 0.49
 Recall: 0.49
 F1: 0.49
+
+Ngram range (1, 2)
+Accuracy: 0.49
+Precision: 0.5
+Recall: 0.49
+F1: 0.49
+
+Ngram range (1, 3)
+Accuracy: 0.5
+Precision: 0.5
+Recall: 0.5
+F1: 0.5
+
+Ngram range (2, 2)
+Accuracy: 0.36
+Precision: 0.47
+Recall: 0.36
+F1: 0.39
+
+Ngram range (2, 3)
+Accuracy: 0.37
+Precision: 0.48
+Recall: 0.37
+F1: 0.39
+
+Ngram range (3, 3)
+Accuracy: 0.21
+Precision: 0.59
+Recall: 0.21
+F1: 0.25
+
+---------------------------------------------------
+
+Bag of Words binary:
+Ngram range (1, 1)
+Accuracy: 0.49
+Precision: 0.49
+Recall: 0.49
+F1: 0.49
+
+Ngram range (1, 2)
+Accuracy: 0.5
+Precision: 0.49
+Recall: 0.5
+F1: 0.49
+
+Ngram range (1, 3)
+Accuracy: 0.5
+Precision: 0.5
+Recall: 0.5
+F1: 0.5
+
+Ngram range (2, 2)
+Accuracy: 0.36
+Precision: 0.47
+Recall: 0.36
+F1: 0.39
+
+Ngram range (2, 3)
+Accuracy: 0.37
+Precision: 0.47
+Recall: 0.37
+F1: 0.39
+
+Ngram range (3, 3)
+Accuracy: 0.21
+Precision: 0.59
+Recall: 0.21
+F1: 0.26
+
+---------------------------------------------------
+
+Tfidf:
+Ngram range (1, 1)
+Accuracy: 0.48
+Precision: 0.48
+Recall: 0.48
+F1: 0.48
+
+Ngram range (1, 2)
+Accuracy: 0.48
+Precision: 0.48
+Recall: 0.48
+F1: 0.48
+
+Ngram range (1, 3)
+Accuracy: 0.48
+Precision: 0.48
+Recall: 0.48
+F1: 0.48
+
+Ngram range (2, 2)
+Accuracy: 0.35
+Precision: 0.43
+Recall: 0.35
+F1: 0.37
+
+Ngram range (2, 3)
+Accuracy: 0.35
+Precision: 0.44
+Recall: 0.35
+F1: 0.37
+
+Ngram range (3, 3)
+Accuracy: 0.21
+Precision: 0.56
+Recall: 0.21
+F1: 0.25
+
+Reuters dataset
+Bag of Words frequencies:
+Ngram range (1, 1)
+Accuracy: 0.76
+Precision: 0.8
+Recall: 0.77
+F1: 0.78
+
+Ngram range (1, 2)
+Accuracy: 0.77
+Precision: 0.81
+Recall: 0.78
+F1: 0.79
+
+Ngram range (1, 3)
+Accuracy: 0.77
+Precision: 0.82
+Recall: 0.78
+F1: 0.79
+
+Ngram range (2, 2)
+Accuracy: 0.71
+Precision: 0.75
+Recall: 0.7
+F1: 0.72
+
+Ngram range (2, 3)
+Accuracy: 0.72
+Precision: 0.75
+Recall: 0.7
+F1: 0.72
+
+Ngram range (3, 3)
+Accuracy: 0.61
+Precision: 0.79
+Recall: 0.62
+F1: 0.68
+
+---------------------------------------------------
+
+Bag of Words binary:
+Ngram range (1, 1)
+Accuracy: 0.76
+Precision: 0.8
+Recall: 0.77
+F1: 0.78
+
+Ngram range (1, 2)
+Accuracy: 0.77
+Precision: 0.81
+Recall: 0.78
+F1: 0.79
+
+Ngram range (1, 3)
+Accuracy: 0.77
+Precision: 0.82
+Recall: 0.78
+F1: 0.79
+
+Ngram range (2, 2)
+Accuracy: 0.71
+Precision: 0.75
+Recall: 0.71
+F1: 0.72
+
+Ngram range (2, 3)
+Accuracy: 0.71
+Precision: 0.75
+Recall: 0.71
+F1: 0.72
+
+Ngram range (3, 3)
+Accuracy: 0.61
+Precision: 0.79
+Recall: 0.61
+F1: 0.68
+
+---------------------------------------------------
+
+Tfidf:
+Ngram range (1, 1)
+Accuracy: 0.75
+Precision: 0.79
+Recall: 0.77
+F1: 0.77
+
+Ngram range (1, 2)
+Accuracy: 0.75
+Precision: 0.79
+Recall: 0.76
+F1: 0.77
+
+Ngram range (1, 3)
+Accuracy: 0.74
+Precision: 0.79
+Recall: 0.76
+F1: 0.77
+
+Ngram range (2, 2)
+Accuracy: 0.71
+Precision: 0.74
+Recall: 0.7
+F1: 0.71
+
+Ngram range (2, 3)
+Accuracy: 0.72
+Precision: 0.75
+Recall: 0.71
+F1: 0.72
+
+Ngram range (3, 3)
+Accuracy: 0.61
+Precision: 0.77
+Recall: 0.61
+F1: 0.67
+
+Decision Tree with gini impurity - 80% train 20% test set:
+20.0 test set size
+Movie reviews dataset
+Bag of Words frequencies:
+Ngram range (1, 1)
+Accuracy: 0.64
+Precision: 0.64
+Recall: 0.64
+F1: 0.64
+
+Ngram range (1, 2)
+Accuracy: 0.62
+Precision: 0.62
+Recall: 0.62
+F1: 0.62
+
+Ngram range (1, 3)
+Accuracy: 0.59
+Precision: 0.59
+Recall: 0.59
+F1: 0.59
+
+Ngram range (2, 2)
+Accuracy: 0.64
+Precision: 0.64
+Recall: 0.64
+F1: 0.64
+
+Ngram range (2, 3)
+Accuracy: 0.6
+Precision: 0.6
+Recall: 0.6
+F1: 0.59
+
+Ngram range (3, 3)
+Accuracy: 0.56
+Precision: 0.6
+Recall: 0.56
+F1: 0.5
+
+---------------------------------------------------
+
+Bag of Words binary:
+Ngram range (1, 1)
+Accuracy: 0.62
+Precision: 0.62
+Recall: 0.62
+F1: 0.61
+
+Ngram range (1, 2)
+Accuracy: 0.6
+Precision: 0.6
+Recall: 0.6
+F1: 0.59
+
+Ngram range (1, 3)
+Accuracy: 0.62
+Precision: 0.62
+Recall: 0.62
+F1: 0.62
+
+Ngram range (2, 2)
+Accuracy: 0.61
+Precision: 0.61
+Recall: 0.61
+F1: 0.61
+
+Ngram range (2, 3)
+Accuracy: 0.61
+Precision: 0.61
+Recall: 0.61
+F1: 0.61
+
+Ngram range (3, 3)
+Accuracy: 0.57
+Precision: 0.61
+Recall: 0.57
+F1: 0.52
+
+---------------------------------------------------
+
+Tfidf:
+Ngram range (1, 1)
+Accuracy: 0.64
+Precision: 0.64
+Recall: 0.64
+F1: 0.64
+
+Ngram range (1, 2)
+Accuracy: 0.68
+Precision: 0.68
+Recall: 0.68
+F1: 0.68
+
+Ngram range (1, 3)
+Accuracy: 0.64
+Precision: 0.64
+Recall: 0.64
+F1: 0.63
+
+Ngram range (2, 2)
+Accuracy: 0.64
+Precision: 0.64
+Recall: 0.64
+F1: 0.63
+
+Ngram range (2, 3)
+Accuracy: 0.62
+Precision: 0.62
+Recall: 0.62
+F1: 0.62
+
+Ngram range (3, 3)
+Accuracy: 0.54
+Precision: 0.56
+Recall: 0.54
+F1: 0.5
+
+20 News Groups dataset
+Bag of Words frequencies:
+Ngram range (1, 1)
+Accuracy: 0.5
+Precision: 0.5
+Recall: 0.5
+F1: 0.5
+
+Ngram range (1, 2)
+Accuracy: 0.5
+Precision: 0.5
+Recall: 0.5
+F1: 0.5
+
+Ngram range (1, 3)
+Accuracy: 0.5
+Precision: 0.5
+Recall: 0.5
+F1: 0.49
+
+Ngram range (2, 2)
+Accuracy: 0.39
+Precision: 0.48
+Recall: 0.39
+F1: 0.41
+
+Ngram range (2, 3)
+Accuracy: 0.38
+Precision: 0.49
+Recall: 0.38
+F1: 0.41
+
+Ngram range (3, 3)
+Accuracy: 0.22
+Precision: 0.61
+Recall: 0.22
+F1: 0.27
+
+---------------------------------------------------
+
+Bag of Words binary:
+Ngram range (1, 1)
+Accuracy: 0.5
+Precision: 0.5
+Recall: 0.5
+F1: 0.5
+
+Ngram range (1, 2)
+Accuracy: 0.5
+Precision: 0.5
+Recall: 0.5
+F1: 0.5
+
+Ngram range (1, 3)
+Accuracy: 0.5
+Precision: 0.5
+Recall: 0.5
+F1: 0.5
+
+Ngram range (2, 2)
+Accuracy: 0.39
+Precision: 0.48
+Recall: 0.39
+F1: 0.41
+
+Ngram range (2, 3)
+Accuracy: 0.38
+Precision: 0.48
+Recall: 0.38
+F1: 0.41
+
+Ngram range (3, 3)
+Accuracy: 0.22
+Precision: 0.61
+Recall: 0.22
+F1: 0.27
+
+---------------------------------------------------
+
+Tfidf:
+Ngram range (1, 1)
+Accuracy: 0.49
+Precision: 0.49
+Recall: 0.49
+F1: 0.49
+
+Ngram range (1, 2)
+Accuracy: 0.48
+Precision: 0.49
+Recall: 0.48
+F1: 0.48
+
+Ngram range (1, 3)
+Accuracy: 0.48
+Precision: 0.48
+Recall: 0.48
+F1: 0.48
+
+Ngram range (2, 2)
+Accuracy: 0.37
+Precision: 0.46
+Recall: 0.37
+F1: 0.4
+
+Ngram range (2, 3)
+Accuracy: 0.37
+Precision: 0.46
+Recall: 0.37
+F1: 0.4
+
+Ngram range (3, 3)
+Accuracy: 0.22
+Precision: 0.59
+Recall: 0.22
+F1: 0.27
+
+Reuters dataset
+Bag of Words frequencies:
+Ngram range (1, 1)
+Accuracy: 0.76
+Precision: 0.8
+Recall: 0.78
+F1: 0.78
+
+Ngram range (1, 2)
+Accuracy: 0.77
+Precision: 0.82
+Recall: 0.79
+F1: 0.8
+
+Ngram range (1, 3)
+Accuracy: 0.77
+Precision: 0.81
+Recall: 0.79
+F1: 0.79
+
+Ngram range (2, 2)
+Accuracy: 0.73
+Precision: 0.76
+Recall: 0.72
+F1: 0.73
+
+Ngram range (2, 3)
+Accuracy: 0.73
+Precision: 0.76
+Recall: 0.72
+F1: 0.73
+
+Ngram range (3, 3)
+Accuracy: 0.62
+Precision: 0.8
+Recall: 0.63
+F1: 0.7
+
+---------------------------------------------------
+
+Bag of Words binary:
+Ngram range (1, 1)
+Accuracy: 0.76
+Precision: 0.8
+Recall: 0.78
+F1: 0.79
+
+Ngram range (1, 2)
+Accuracy: 0.78
+Precision: 0.82
+Recall: 0.79
+F1: 0.8
+
+Ngram range (1, 3)
+Accuracy: 0.77
+Precision: 0.81
+Recall: 0.79
+F1: 0.79
+
+Ngram range (2, 2)
+Accuracy: 0.72
+Precision: 0.76
+Recall: 0.72
+F1: 0.72
+
+Ngram range (2, 3)
+Accuracy: 0.73
+Precision: 0.76
+Recall: 0.72
+F1: 0.73
+
+Ngram range (3, 3)
+Accuracy: 0.63
+Precision: 0.8
+Recall: 0.63
+F1: 0.7
+
+---------------------------------------------------
+
+Tfidf:
+Ngram range (1, 1)
+Accuracy: 0.76
+Precision: 0.81
+Recall: 0.79
+F1: 0.79
+
+Ngram range (1, 2)
+Accuracy: 0.75
+Precision: 0.8
+Recall: 0.78
+F1: 0.79
+
+Ngram range (1, 3)
+Accuracy: 0.75
+Precision: 0.79
+Recall: 0.78
+F1: 0.78
+
+Ngram range (2, 2)
+Accuracy: 0.7
+Precision: 0.74
+Recall: 0.71
+F1: 0.71
+
+Ngram range (2, 3)
+Accuracy: 0.71
+Precision: 0.74
+Recall: 0.71
+F1: 0.72
+
+Ngram range (3, 3)
+Accuracy: 0.62
+Precision: 0.78
+Recall: 0.62
+F1: 0.68
+
+Decision Tree with gini impurity - 90% train 10% test set:
+10.0 test set size
+Movie reviews dataset
+Bag of Words frequencies:
+Ngram range (1, 1)
+Accuracy: 0.66
+Precision: 0.66
+Recall: 0.66
+F1: 0.66
+
+Ngram range (1, 2)
+Accuracy: 0.64
+Precision:
