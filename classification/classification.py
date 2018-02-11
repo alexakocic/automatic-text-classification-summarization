@@ -31,4 +31,4 @@ def create_classification_model_and_evaluate(classifier, train_vectors,
         test_labels = [list(label) for label in mlb.inverse_transform(test_labels)]
         predictions = [list(label) for label in mlb.inverse_transform(predictions)]
     
-    return test_labels, predictions
+    return classifier, test_labels, predictions

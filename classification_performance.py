@@ -45,7 +45,7 @@ def prepare_data(train_data, test_data, type_='bow', binary=False, ngram_range=(
         raise ValueError("Wrong value for type_ parameter. Type help(prepare_data) to see the list of possible values.")
     
     test_vectors = vectorizer.transform(test_data)
-    return train_vectors, test_vectors
+    return train_vectors, test_vectors, vectorizer
 
 def convert_multiclass_list_to_labels(predictions, mlb):
     pass
@@ -136,6 +136,7 @@ def generate_data_and_test_classifiers(classifier, test_set_percentage, data_get
         i += 1
 
 
+"""
 print("Multinomial Naive Bayes - 70% train 30% test set:")
 generate_data_and_test_classifiers(MultinomialNB(), 0.3, [data.get_movie_reviews, data.get_20newsgroups], ["Movie reviews dataset", "20 News Groups dataset"])
 print("Multinomial Naive Bayes - 80% train 20% test set:")
@@ -171,9 +172,11 @@ generate_data_and_test_classifiers(DecisionTreeClassifier(criterion='entropy'), 
 print("Decision Tree with entropy - 90% train 10% test set:")
 generate_data_and_test_classifiers(DecisionTreeClassifier(criterion='entropy'), 0.1, [data.get_movie_reviews, data.get_20newsgroups, data.get_reuters], ["Movie reviews dataset", "20 News Groups dataset", "Reuters dataset"], [False, False, True])
 
+
 print("Support Vector Machine - 70% train 30% test set:")
-generate_data_and_test_classifiers(SVC(criterion='entropy'), 0.3, [data.get_movie_reviews, data.get_20newsgroups], ["Movie reviews dataset", "20 News Groups dataset"])
+generate_data_and_test_classifiers(SVC(), 0.3, [data.get_movie_reviews, data.get_20newsgroups], ["Movie reviews dataset", "20 News Groups dataset"])
 print("Support Vector Machine - 80% train 20% test set:")
-generate_data_and_test_classifiers(SVC(criterion='entropy'), 0.2, [data.get_movie_reviews, data.get_20newsgroups], ["Movie reviews dataset", "20 News Groups dataset"])
+generate_data_and_test_classifiers(SVC(), 0.2, [data.get_movie_reviews, data.get_20newsgroups], ["Movie reviews dataset", "20 News Groups dataset"])
 print("Support Vector Machine - 90% train 10% test set:")
-generate_data_and_test_classifiers(SVC(criterion='entropy'), 0.1, [data.get_movie_reviews, data.get_20newsgroups], ["Movie reviews dataset", "20 News Groups dataset"])
+generate_data_and_test_classifiers(SVC(), 0.1, [data.get_movie_reviews, data.get_20newsgroups], ["Movie reviews dataset", "20 News Groups dataset"])
+"""
