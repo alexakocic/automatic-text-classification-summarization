@@ -59,6 +59,7 @@ train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions
 
 train_data_r, test_data_r, main_vectorizer = prepare_data(train_data, test_data, type_='bow', binary=False, ngram_range=(1, 3))
 
+
 main_classifier, test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(alpha=0.0001), train_data_r, train_labels, test_data_r, test_labels)
 
 sorted_labels = list(reversed([lab[0] for lab in cmn.most_common()]))
@@ -66,7 +67,6 @@ sorted_labels = list(reversed([lab[0] for lab in cmn.most_common()]))
 print('\n\n')
 
 pipeline = list()
-vectorizers = list()
 errors = list()
 
 sorted_labels = [lab for lab in sorted_labels if cmn[lab] > 2]
@@ -93,520 +93,75 @@ for lab in sorted_labels:
     
     print(lab + ' [' + str(cmn[lab]) + '] ' + ':\n')
     #train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, class_labels, 0.25)
-    if len(set(class_labels_train)) != 2 or len(set(test_labels)) != 2:
+    if len(set(class_labels_train)) != 2 or len(set(class_labels_test)) != 2:
         errors.append((lab, index))
         pipeline.append('error')
         vectorizers.append('error')
         print('Error\n\n')
         continue
-        """
-        if len(set(class_labels_train)) == 2:
-            full = class_labels_train
-            full_data = train_data
-            empty = test_labels
-            empty_data = test_data
-        else:
-            full = test_labels
-            full_data = test_data
-            empty = class_labels_train
-            empty_data = train_data
         
-        cnt = 0
-        for i in range(len(full)):
-            if full[i] != 'other':
-                cnt += 1
-        
-        to_remove = list()
-        to_remove_data = list()
-        new_cnt = 0
-        for i in range(len(full)):
-            if new_cnt > cnt / 2:
-                break
-            if full[i] != 'other':
-                empty.append(full[i])
-                empty_data.append(full_data[i])
-                to_remove.append(full[i])
-                to_remove_data.append(full_data[i])
-                new_cnt += 1
-        
-        for lab in to_remove:
-            full.remove(lab)
-        
-        for data in to_remove_data:
-            full_data.remove(data)
-        
-        if len(set(train_labels)) != 2 or len(set(test_labels)) != 2:
-            something_wrong = True
-            print("Something is terribly wrong...\n")
-        
-        del full, full_data, empty, empty_data, cnt, new_cnt
-        """
     #train_data_r, test_data_r, vectorizer = prepare_data(train_data, test_data, type_='bow', binary=False, ngram_range=(1, 3))
-    classifier, test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(alpha=0.0001), train_data_r, class_labels_train, test_data_r, class_labels_test)
+    classifier, real_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(alpha=0.0001), train_data_r, class_labels_train, test_data_r, class_labels_test)
     pipeline.append(classifier)
-    vectorizers.append(vectorizer)
     print('\n\n')
+
+for lab, index in errors:
+    train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.3)
+    
+    labs = list()
+    for label in train_labels:
+        if label != lab:
+            labs.append('other')
+        else:
+            labs.append(label)
+    train_labels = copy.deepcopy(labs)
+    
+    labs = list()
+    for label in test_labels:
+        if label != lab:
+            labs.append('other')
+        else:
+            labs.append(label)
+    test_labels = copy.deepcopy(labs)
+
+    if len(set(train_labels)) == 2:
+        full = train_labels
+        full_data = train_data
+        empty = test_labels
+        empty_data = test_data
+    else:
+        full = test_labels
+        full_data = test_data
+        empty = train_labels
+        empty_data = train_data
         
-"""
-print("30% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='bow', binary=True, ngram_range=(1, 1))
-
-print("BOW binary, (1, 1)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.2)
-
-print("20% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='bow', binary=True, ngram_range=(1, 1))
-
-print("BOW binary, (1, 1)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.1)
-
-print("10% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='bow', binary=True, ngram_range=(1, 1))
-
-print("BOW binary, (1, 1)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.3)
-
-print("30% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='bow', binary=True, ngram_range=(1, 2))
-
-print("BOW binary, (1, 2)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.2)
-
-print("20% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='bow', binary=True, ngram_range=(1, 2))
-
-print("BOW binary, (1, 2)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.1)
-
-print("10% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='bow', binary=True, ngram_range=(1, 2))
-
-print("BOW binary, (1, 2)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.3)
-
-print("30% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='bow', binary=True, ngram_range=(2, 3))
-
-print("BOW binary, (2, 3)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.2)
-
-print("20% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='bow', binary=True, ngram_range=(2, 3))
-
-print("BOW binary, (2, 3)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.1)
-
-print("10% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='bow', binary=True, ngram_range=(2, 3))
-
-print("BOW binary, (2, 3)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.3)
-
-print("30% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='bow', binary=False, ngram_range=(1, 1))
-
-print("BOW, (1, 1)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.2)
-
-print("20% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='bow', binary=False, ngram_range=(1, 1))
-
-print("BOW, (1, 1)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.1)
-
-print("10% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='bow', binary=False, ngram_range=(1, 1))
-
-print("BOW, (1, 1)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.3)
-
-print("30% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='bow', binary=False, ngram_range=(1, 2))
-
-print("BOW, (1, 2)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.2)
-
-print("20% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='bow', binary=False, ngram_range=(1, 2))
-
-print("BOW, (1, 2)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.1)
-
-print("10% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='bow', binary=False, ngram_range=(1, 2))
-
-print("BOW, (1, 2)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.3)
-
-print("30% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='bow', binary=False, ngram_range=(2, 3))
-
-print("BOW, (2, 3)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.2)
-
-print("20% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='bow', binary=False, ngram_range=(2, 3))
-
-print("BOW, (2, 3)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.1)
-
-print("10% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='bow', binary=False, ngram_range=(2, 3))
-
-print("BOW, (2, 3)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.3)
-
-print("30% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='tfidf', binary=False, ngram_range=(1, 1))
-
-print("tfidf, (1, 1)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.2)
-
-print("20% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='tfidf', binary=False, ngram_range=(1, 1))
-
-print("tfidf, (1, 1)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.1)
-
-print("10% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='tfidf', binary=False, ngram_range=(1, 1))
-
-print("tfidf, (1, 1)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.3)
-
-print("30% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='tfidf', binary=False, ngram_range=(1, 2))
-
-print("tfidf, (1, 2)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.2)
-
-print("20% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='tfidf', binary=False, ngram_range=(1, 2))
-
-print("tfidf, (1, 2)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.1)
-
-print("10% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='tfidf', binary=False, ngram_range=(1, 2))
-
-print("tfidf, (1, 2)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.3)
-
-print("30% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='tfidf', binary=False, ngram_range=(2, 3))
-
-print("tfidf, (2, 3)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.2)
-
-print("20% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='tfidf', binary=False, ngram_range=(2, 3))
-
-print("tfidf, (2, 3)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.1)
-
-print("10% test set")
-
-train_data_r, test_data_r = prepare_data(train_data, test_data, type_='tfidf', binary=False, ngram_range=(2, 3))
-
-print("tfidf, (2, 3)")
-
-print("Naive Bayes")
-test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(), train_data_r, train_labels, test_data_r, test_labels)
-#print("Support Vector Machine")
-#test_labels, predictions  = create_classification_model_and_evaluate(SVC(), train_data_r, train_labels, test_data_r, test_labels)
-print("DecisionTree")
-test_labels, predictions  = create_classification_model_and_evaluate(DecisionTreeClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-print("KNN")
-test_labels, predictions  = create_classification_model_and_evaluate(KNeighborsClassifier(), train_data_r, train_labels, test_data_r, test_labels)
-"""
+    cnt = 0
+    for i in range(len(full)):
+        if full[i] != 'other':
+            cnt += 1
+        
+    to_remove = list()
+    to_remove_data = list()
+    new_cnt = 0
+    for i in range(len(full)):
+        if new_cnt > cnt / 2:
+            break
+        if full[i] != 'other':
+            empty.append(full[i])
+            empty_data.append(full_data[i])
+            to_remove.append(full[i])
+            to_remove_data.append(full_data[i])
+            new_cnt += 1
+        
+    for lab in to_remove:
+        full.remove(lab)
+        
+    for data in to_remove_data:
+        full_data.remove(data)
+        
+    if len(set(train_labels)) != 2 or len(set(test_labels)) != 2:
+        print("Something is terribly wrong...\n")
+    
+    train_data_r, test_data_r, vectorizer = prepare_data(train_data, test_data, type_='bow', binary=False, ngram_range=(1, 3))
+    classifier, real_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(alpha=0.0001), train_data_r, train_labels, test_data_r, test_labels)
+    pipeline[index] = classifier
