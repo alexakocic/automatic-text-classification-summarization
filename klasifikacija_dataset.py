@@ -96,7 +96,6 @@ for lab in sorted_labels:
     if len(set(class_labels_train)) != 2 or len(set(class_labels_test)) != 2:
         errors.append((lab, index))
         pipeline.append('error')
-        vectorizers.append('error')
         print('Error\n\n')
         continue
         
@@ -105,6 +104,7 @@ for lab in sorted_labels:
     pipeline.append(classifier)
     print('\n\n')
 
+modified_vectorizers = dict()
 for lab, index in errors:
     train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.3)
     
@@ -162,6 +162,32 @@ for lab, index in errors:
     if len(set(train_labels)) != 2 or len(set(test_labels)) != 2:
         print("Something is terribly wrong...\n")
     
-    train_data_r, test_data_r, vectorizer = prepare_data(train_data, test_data, type_='bow', binary=False, ngram_range=(1, 3))
+    train_data_r, test_data_r, vectorizer_modified = prepare_data(train_data, test_data, type_='bow', binary=False, ngram_range=(1, 3))
     classifier, real_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(alpha=0.0001), train_data_r, train_labels, test_data_r, test_labels)
+    modified_vectorizers[lab] = vectorizer_modified
     pipeline[index] = classifier
+    
+def classify(text, normalizer, pipeline, labels, vectorizer, modified_vectorizers, bulk_classifier, bulk_vectorizer):
+    normalized_text = [' '.join(normalizer.normalize_text(text))]
+    predicted_labels = list()
+    
+    for i in range(len(pipeline)):
+        if labels[i] in modified_vectorizers.keys():
+            vector = modified_vectorizers[labels[i]].transform(normalized_text)
+        else:
+            vector = vectorizer.transform(normalized_text)
+        
+        prediction = pipeline[i].predict(vector).tolist()[0]
+        if prediction != 'other':
+            predicted_labels.append(prediction)
+        
+    bulk_vector = bulk_vectorizer.transform(normalized_text)
+    bulk_prediction = bulk_classifier.predict(bulk_vector).tolist()[0]
+    
+    if bulk_prediction in set(predicted_labels):
+        predicted_labels.remove(bulk_prediction)
+        predicted_labels = [bulk_prediction] + predicted_labels
+    else:
+        predicted_labels.append(bulk_prediction)
+    
+    return predicted_labels
