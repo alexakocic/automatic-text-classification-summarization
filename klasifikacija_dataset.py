@@ -9,14 +9,44 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from classification.classification import create_classification_model_and_evaluate
 from classification.data.train_test_data import prepare_datasets
 from collections import Counter
-import pickle
 import copy
-import gc
+import urllib.request
+import json
 
-from classification_performance import *
+from classification_perform import *
 
-from sklearn.feature_selection import SelectFromModel
-from sklearn.feature_selection import SelectKBest, chi2
+def read_file_and_process(path):
+    with open(path, 'r') as f:
+        fnquads = list()
+        for line in f:
+            split = line.split(' ')
+            fnquad = list()
+            fnquad.append(split[0])
+            fnquad.append(split[1])
+            text = " ".join(split[2:len(split) - 2])
+            fnquad.append(text)
+            fnquad.append(split[len(split) - 2])
+            fnquad.append(split[len(split) - 1])
+            fnquads.append(fnquad)
+
+    labels = [fnquad[3] for fnquad in fnquads]
+
+    cmn = Counter(labels)
+
+    new_fnquads = list()
+    for fnquad in fnquads:
+        if cmn[fnquad[3]] > 2:
+            new_fnquads.append(fnquad)
+
+    fnquads = new_fnquads
+    descriptions = [fnquad[2] for fnquad in fnquads]
+    normalizer = Normalizer()
+    descriptions = [normalizer.normalize_text(description) for description in descriptions]
+
+    descriptions = [' '.join(description) for description in descriptions]
+
+    labels = [fnquad[3] for fnquad in fnquads]
+    
 
 with open(r'C:\Users\aleks\Desktop\lov_filtered.nq', 'r') as f:
     fnquads = list()
@@ -54,6 +84,10 @@ descriptions = [' '.join(description) for description in descriptions]
 
 labels = [fnquad[3] for fnquad in fnquads]
 
+d = json.loads(urllib.request.urlopen(r"http://lov.okfn.org/dataset/lov/api/v2/vocabulary/list").read())
+label_mappings = dict()
+for j in d:
+    label_mappings[j['uri']] = j["titles"][0]["value"]
 
 train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.1)
 
@@ -71,8 +105,8 @@ errors = list()
 
 sorted_labels = [lab for lab in sorted_labels if cmn[lab] > 2]
 
-train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.3)
-train_data_r, test_data_r, vectorizer = prepare_data(train_data, test_data, type_='bow', binary=False, ngram_range=(1, 3))
+#train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.3)
+#train_data_r, test_data_r, vectorizer = prepare_data(train_data, test_data, type_='bow', binary=False, ngram_range=(1, 3))
 
 index = -1
 for lab in sorted_labels:
@@ -106,7 +140,7 @@ for lab in sorted_labels:
 
 modified_vectorizers = dict()
 for lab, index in errors:
-    train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.3)
+    train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.1)
     
     labs = list()
     for label in train_labels:
@@ -129,11 +163,13 @@ for lab, index in errors:
         full_data = train_data
         empty = test_labels
         empty_data = test_data
+        treshold = 1/3
     else:
         full = test_labels
         full_data = test_data
         empty = train_labels
         empty_data = train_data
+        treshold = 2/3
         
     cnt = 0
     for i in range(len(full)):
@@ -144,7 +180,7 @@ for lab, index in errors:
     to_remove_data = list()
     new_cnt = 0
     for i in range(len(full)):
-        if new_cnt > cnt / 2:
+        if new_cnt > cnt * treshold:
             break
         if full[i] != 'other':
             empty.append(full[i])
@@ -167,11 +203,12 @@ for lab, index in errors:
     modified_vectorizers[lab] = vectorizer_modified
     pipeline[index] = classifier
     
-def classify(text, normalizer, pipeline, labels, vectorizer, modified_vectorizers, bulk_classifier, bulk_vectorizer):
+def classify(text, normalizer, pipeline, labels, vectorizer, modified_vectorizers, bulk_classifier, bulk_vectorizer, label_mappings):
     normalized_text = [' '.join(normalizer.normalize_text(text))]
     predicted_labels = list()
     
     for i in range(len(pipeline)):
+        print(i)
         if labels[i] in modified_vectorizers.keys():
             vector = modified_vectorizers[labels[i]].transform(normalized_text)
         else:
@@ -189,5 +226,14 @@ def classify(text, normalizer, pipeline, labels, vectorizer, modified_vectorizer
         predicted_labels = [bulk_prediction] + predicted_labels
     else:
         predicted_labels.append(bulk_prediction)
+        
+    result = list()
+    for predicted_label in predicted_labels:
+        result.append(label_mappings[predicted_label[1:len(predicted_label) - 1]])
     
-    return predicted_labels
+    return result
+
+def decode(prediction, label_mappings):
+    for key in label_mappings.keys():
+        if label_mappings[key] == prediction:
+            return key
