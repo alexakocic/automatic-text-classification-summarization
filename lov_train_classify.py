@@ -63,6 +63,8 @@ def create_label_mappings():
     return label_mappings
     
 def train(file, type_):
+    print("Training")
+    
     if type_ == "path":
         descriptions, labels, sorted_labels = read_file_and_process(r'C:\Users\aleks\Desktop\lov_filtered.nq')
     elif type_ == "bin":
@@ -171,6 +173,8 @@ def train(file, type_):
         return normalizer, pipeline, sorted_labels, vectorizer, modified_vectorizers, main_classifier, label_mappings
     
 def classify(text, normalizer, pipeline, labels, vectorizer, modified_vectorizers, bulk_classifier, label_mappings):
+    print("Classifying")
+    
     normalized_text = [' '.join(normalizer.normalize_text(text))]
     predicted_labels = list()
     
