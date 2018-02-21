@@ -63,7 +63,7 @@ def create_label_mappings():
     return label_mappings
     
 def train(file, type_):
-    print("Training")
+    print("Training...")
     
     if type_ == "path":
         descriptions, labels, sorted_labels = read_file_and_process(r'C:\Users\aleks\Desktop\lov_filtered.nq')
@@ -76,6 +76,13 @@ def train(file, type_):
     
     label_mappings = create_label_mappings()
     train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.1)    
+    
+    with open(r'.\train_data.txt', 'w') as f:
+        print('Creating test data file...')
+        for i in range(len(test_data)):
+            f.write(test_data[i] + '\t' + test_labels[i] + '\n')
+        print('Done creating test data file.')
+    
     train_data_r, test_data_r, vectorizer = prepare_data(train_data, test_data, type_='bow', binary=False, ngram_range=(1, 3))    
     main_classifier, test_labels, predictions  = create_classification_model_and_evaluate(MultinomialNB(alpha=0.0001), train_data_r, train_labels, test_data_r, test_labels)
     
@@ -170,11 +177,10 @@ def train(file, type_):
         modified_vectorizers[lab] = vectorizer_modified
         pipeline[index] = classifier
         
+        print("Training done.")
         return normalizer, pipeline, sorted_labels, vectorizer, modified_vectorizers, main_classifier, label_mappings
     
 def classify(text, normalizer, pipeline, labels, vectorizer, modified_vectorizers, bulk_classifier, label_mappings):
-    print("Classifying")
-    
     normalized_text = [' '.join(normalizer.normalize_text(text))]
     predicted_labels = list()
     
