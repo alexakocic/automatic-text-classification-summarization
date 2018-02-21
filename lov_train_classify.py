@@ -41,6 +41,7 @@ def read_file_and_process(path):
     
         fnquads = new_fnquads
         descriptions = [fnquad[2] for fnquad in fnquads]
+        descriptions_raw = copy.deepcopy(descriptions)
         normalizer = Normalizer()
         descriptions = [normalizer.normalize_text(description) for description in descriptions]
     
@@ -51,7 +52,7 @@ def read_file_and_process(path):
         sorted_labels = list(reversed([lab[0] for lab in cmn.most_common()]))
         sorted_labels = [lab for lab in sorted_labels if cmn[lab] > 2]
         
-        return descriptions, labels, sorted_labels
+        return descriptions_raw, descriptions, labels, sorted_labels
     except Exception as e:
         raise Exception("Something went wrong in processing file on location " + path)
 
@@ -66,7 +67,7 @@ def train(file, type_):
     print("Training...")
     
     if type_ == "path":
-        descriptions, labels, sorted_labels = read_file_and_process(r'C:\Users\aleks\Desktop\lov_filtered.nq')
+        descriptions_raw, descriptions, labels, sorted_labels = read_file_and_process(r'C:\Users\aleks\Desktop\lov_filtered.nq')
     elif type_ == "bin":
         pass
     elif type_ == "uri":
@@ -77,10 +78,15 @@ def train(file, type_):
     label_mappings = create_label_mappings()
     train_data, test_data, train_labels, test_labels = prepare_datasets(descriptions, labels, 0.1)    
     
-    with open(r'.\train_data.txt', 'w') as f:
+    dictionary = dict()
+    
+    for i in range(len(descriptions)):
+        dictionary[descriptions[i]] = descriptions_raw[i]
+    
+    with open(r'train_data.txt', 'w') as f:
         print('Creating test data file...')
         for i in range(len(test_data)):
-            f.write(test_data[i] + '\t' + test_labels[i] + '\n')
+            f.write(dictionary[test_data[i]] + '\t' + test_labels[i] + '\n')
         print('Done creating test data file.')
     
     train_data_r, test_data_r, vectorizer = prepare_data(train_data, test_data, type_='bow', binary=False, ngram_range=(1, 3))    
